@@ -38,6 +38,8 @@ export function CampanasPage() {
   const [campanaSeleccionada, setCampanaSeleccionada] = useState<string>('')
   const [espacios, setEspacios] = useState<Espacio[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [debugPasos, setDebugPasos] = useState<string[]>([])
+  const agregarPaso = (msg: string) => setDebugPasos((prev) => [...prev, msg])
   const [cargando, setCargando] = useState(true)
 
   // Formulario nueva campaña
@@ -129,13 +131,17 @@ export function CampanasPage() {
 
   // Inicializar mapa + controles de dibujo una sola vez
   useEffect(() => {
+    agregarPaso(`Efecto disparado. mapDivRef=${!!mapDivRef.current} mapRef=${!!mapRef.current}`)
     if (!mapDivRef.current || mapRef.current) return
 
     try {
+      agregarPaso('Creando L.map()…')
       const map = L.map(mapDivRef.current).setView([-17.7833, -63.1821], 15)
+      agregarPaso('L.map() creado OK. Agregando capa de tiles…')
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap',
       }).addTo(map)
+      agregarPaso('Capa de tiles agregada.')
 
       const drawnItems = new L.FeatureGroup()
       map.addLayer(drawnItems)
@@ -152,6 +158,7 @@ export function CampanasPage() {
 
       const observador = new ResizeObserver(forzarRecalculoTamano)
       observador.observe(mapDivRef.current)
+      agregarPaso(`Tamaño del contenedor: ${mapDivRef.current.clientWidth}x${mapDivRef.current.clientHeight}px`)
 
       // El control de dibujo se agrega en un segundo paso, envuelto aparte,
       // para que si algo falla acá el mapa base ya haya quedado visible.
@@ -350,6 +357,27 @@ export function CampanasPage() {
             Usá el ícono de polígono (⬠) en la esquina del mapa para dibujar un espacio nuevo. Al cerrar el
             polígono, te va a pedir el nombre.
           </p>
+          {debugPasos.length > 0 && (
+            <div
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: 11,
+                color: 'var(--teal)',
+                background: 'var(--ink-soft)',
+                border: '1px solid var(--ink-line)',
+                borderRadius: 8,
+                padding: 10,
+                marginBottom: 10,
+                whiteSpace: 'pre-wrap',
+              }}
+            >
+              {debugPasos.map((p, i) => (
+                <div key={i}>
+                  {i + 1}. {p}
+                </div>
+              ))}
+            </div>
+          )}
           <div ref={mapDivRef} className="el-campanas-mapa" />
 
           <h2 className="el-title" style={{ fontSize: 18, marginTop: 20 }}>
