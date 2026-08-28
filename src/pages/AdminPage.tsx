@@ -4,6 +4,7 @@ import { CampanasPage } from './CampanasPage'
 
 interface RegistroConAutor extends Registro {
   autor_nombre?: string
+  campana_nombre?: string
 }
 
 function generarIdUnico(ciudad: string): string {
@@ -20,6 +21,14 @@ function generarIdUnico(ciudad: string): string {
   return `EL-${codigoCiudad}-${anio}-${sufijo}`
 }
 
+interface GrupoRevision {
+  clave: string
+  informeId: string | null
+  autorNombre: string
+  campanaNombre: string | null
+  registros: RegistroConAutor[]
+}
+
 export function AdminPage() {
   const [seccion, setSeccion] = useState<'revision' | 'campanas'>('revision')
   const [registros, setRegistros] = useState<RegistroConAutor[]>([])
@@ -33,17 +42,22 @@ export function AdminPage() {
     setCargando(true)
     setError(null)
 
-    const estadosPorFiltro = {
-      pendientes: ['completa', 'pendiente_revision'],
-      validados: ['validada'],
-      rechazados: ['rechazada'],
+    let query = supabase.from('registros').select('*')
+
+    if (filtroEstado === 'pendientes') {
+      // Piezas personales completas (van directo a revisión) O piezas de
+      // investigación que ya fueron entregadas en un informe (informe_id
+      // presente) O piezas ya marcadas explícitamente pendiente_revision.
+      query = query.or(
+        'estado.eq.pendiente_revision,and(estado.eq.completa,origen.eq.personal),and(estado.eq.completa,informe_id.not.is.null)',
+      )
+    } else if (filtroEstado === 'validados') {
+      query = query.eq('estado', 'validada')
+    } else {
+      query = query.eq('estado', 'rechazada')
     }
 
-    const { data, error: err } = await supabase
-      .from('registros')
-      .select('*')
-      .in('estado', estadosPorFiltro[filtroEstado])
-      .order('fecha_registro', { ascending: false })
+    const { data, error: err } = await query.order('fecha_registro', { ascending: false })
 
     if (err) {
       setError('No se pudieron cargar los registros: ' + err.message)
@@ -53,8 +67,9 @@ export function AdminPage() {
 
     const regs = (data as Registro[]) ?? []
     const idsUnicos = [...new Set(regs.map((r) => r.usuario_id))]
-    let mapaNombres: Record<string, string> = {}
+    const idsCampanas = [...new Set(regs.map((r) => r.campana_id).filter(Boolean))] as string[]
 
+    let mapaNombres: Record<string, string> = {}
     if (idsUnicos.length > 0) {
       const { data: perfiles } = await supabase
         .from('perfiles')
@@ -65,7 +80,21 @@ export function AdminPage() {
       }
     }
 
-    setRegistros(regs.map((r) => ({ ...r, autor_nombre: mapaNombres[r.usuario_id] ?? 'Desconocido' })))
+    let mapaCampanas: Record<string, string> = {}
+    if (idsCampanas.length > 0) {
+      const { data: campanas } = await supabase.from('campanas').select('id, nombre').in('id', idsCampanas)
+      for (const c of (campanas as { id: string; nombre: string }[]) ?? []) {
+        mapaCampanas[c.id] = c.nombre
+      }
+    }
+
+    setRegistros(
+      regs.map((r) => ({
+        ...r,
+        autor_nombre: mapaNombres[r.usuario_id] ?? 'Desconocido',
+        campana_nombre: r.campana_id ? mapaCampanas[r.campana_id] : undefined,
+      })),
+    )
     setCargando(false)
   }
 
@@ -114,6 +143,86 @@ export function AdminPage() {
       setRegistros((prev) => prev.filter((x) => x.id !== r.id))
     }
     setProcesando(null)
+  }
+
+  // Agrupar por informe (piezas de investigación entregadas juntas);
+  // las piezas personales quedan cada una en su propio "grupo" de 1.
+  const grupos: GrupoRevision[] = []
+  for (const r of registros) {
+    const clave = r.informe_id ?? `individual-${r.id}`
+    let grupo = grupos.find((g) => g.clave === clave)
+    if (!grupo) {
+      grupo = {
+        clave,
+        informeId: r.informe_id,
+        autorNombre: r.autor_nombre ?? 'Desconocido',
+        campanaNombre: r.campana_nombre ?? null,
+        registros: [],
+      }
+      grupos.push(grupo)
+    }
+    grupo.registros.push(r)
+  }
+
+  function tarjetaRegistro(r: RegistroConAutor) {
+    return (
+      <div key={r.id} className="el-card el-admin-item" style={{ marginBottom: 10 }}>
+        {r.foto_url && <img src={r.foto_url} alt="" className="el-admin-foto" />}
+        <div className="el-admin-datos">
+          <span className={`el-badge el-badge-${r.estado}`}>{r.estado.replace('_', ' ')}</span>
+          <p className="el-admin-linea">
+            <strong>Ciudad:</strong> {r.ciudad} {r.direccion_calle ? `· ${r.direccion_calle}` : ''}
+          </p>
+          <p className="el-admin-linea">
+            <strong>Técnica:</strong> {r.tecnica || '—'} &nbsp; <strong>Soporte:</strong> {r.soporte || '—'}
+          </p>
+          <p className="el-admin-linea">
+            <strong>Función:</strong> {r.funcion || '—'} &nbsp; <strong>Estado:</strong>{' '}
+            {r.estado_conservacion || '—'}
+          </p>
+          {r.texto_principal && (
+            <p className="el-admin-linea">
+              <strong>Texto:</strong> "{r.texto_principal}"
+            </p>
+          )}
+          {r.notas_admin && (
+            <p className="el-admin-linea" style={{ color: 'var(--brick)' }}>
+              <strong>Observación previa:</strong> {r.notas_admin}
+            </p>
+          )}
+
+          {filtroEstado === 'pendientes' && (
+            <>
+              <textarea
+                className="el-textarea"
+                placeholder="Observación (obligatoria solo si vas a rechazar)"
+                value={notas[r.id] ?? ''}
+                onChange={(e) => setNotas({ ...notas, [r.id]: e.target.value })}
+                style={{ marginTop: 10, minHeight: 50 }}
+              />
+              <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                <button
+                  type="button"
+                  className="el-btn el-btn-danger"
+                  disabled={procesando === r.id}
+                  onClick={() => rechazar(r)}
+                >
+                  Rechazar
+                </button>
+                <button
+                  type="button"
+                  className="el-btn el-btn-primary"
+                  disabled={procesando === r.id}
+                  onClick={() => aprobar(r)}
+                >
+                  {procesando === r.id ? 'Guardando…' : 'Aprobar'}
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -170,72 +279,37 @@ export function AdminPage() {
           {error && <div className="el-error">{error}</div>}
 
           {cargando ? (
-        <p className="el-hint">Cargando…</p>
-      ) : registros.length === 0 ? (
-        <p className="el-hint">No hay registros en esta categoría.</p>
-      ) : (
-        registros.map((r) => (
-          <div key={r.id} className="el-card el-admin-item">
-            {r.foto_url && <img src={r.foto_url} alt="" className="el-admin-foto" />}
-            <div className="el-admin-datos">
-              <span className={`el-badge el-badge-${r.estado}`}>{r.estado.replace('_', ' ')}</span>
-              <p className="el-admin-linea">
-                <strong>Autor:</strong> {r.autor_nombre}
-              </p>
-              <p className="el-admin-linea">
-                <strong>Ciudad:</strong> {r.ciudad} {r.direccion_calle ? `· ${r.direccion_calle}` : ''}
-              </p>
-              <p className="el-admin-linea">
-                <strong>Técnica:</strong> {r.tecnica || '—'} &nbsp; <strong>Soporte:</strong> {r.soporte || '—'}
-              </p>
-              <p className="el-admin-linea">
-                <strong>Función:</strong> {r.funcion || '—'} &nbsp; <strong>Estado:</strong>{' '}
-                {r.estado_conservacion || '—'}
-              </p>
-              {r.texto_principal && (
-                <p className="el-admin-linea">
-                  <strong>Texto:</strong> "{r.texto_principal}"
-                </p>
-              )}
-              {r.notas_admin && (
-                <p className="el-admin-linea" style={{ color: 'var(--brick)' }}>
-                  <strong>Observación previa:</strong> {r.notas_admin}
-                </p>
-              )}
-
-              {filtroEstado === 'pendientes' && (
-                <>
-                  <textarea
-                    className="el-textarea"
-                    placeholder="Observación (obligatoria solo si vas a rechazar)"
-                    value={notas[r.id] ?? ''}
-                    onChange={(e) => setNotas({ ...notas, [r.id]: e.target.value })}
-                    style={{ marginTop: 10, minHeight: 50 }}
-                  />
-                  <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-                    <button
-                      type="button"
-                      className="el-btn el-btn-danger"
-                      disabled={procesando === r.id}
-                      onClick={() => rechazar(r)}
-                    >
-                      Rechazar
-                    </button>
-                    <button
-                      type="button"
-                      className="el-btn el-btn-primary"
-                      disabled={procesando === r.id}
-                      onClick={() => aprobar(r)}
-                    >
-                      {procesando === r.id ? 'Guardando…' : 'Aprobar'}
-                    </button>
+            <p className="el-hint">Cargando…</p>
+          ) : grupos.length === 0 ? (
+            <p className="el-hint">No hay registros en esta categoría.</p>
+          ) : (
+            grupos.map((g) => (
+              <div key={g.clave} style={{ marginBottom: 20 }}>
+                {g.informeId && (
+                  <div
+                    style={{
+                      background: 'var(--ink-soft)',
+                      border: '1px solid var(--ochre)',
+                      borderRadius: 8,
+                      padding: '8px 12px',
+                      marginBottom: 8,
+                      fontSize: 14,
+                    }}
+                  >
+                    📋 Informe de <strong>{g.autorNombre}</strong>
+                    {g.campanaNombre ? ` — ${g.campanaNombre}` : ''} · {g.registros.length} pieza
+                    {g.registros.length === 1 ? '' : 's'}
                   </div>
-                </>
-              )}
-            </div>
-          </div>
-        ))
-      )}
+                )}
+                {!g.informeId && (
+                  <p className="el-hint" style={{ marginBottom: 6 }}>
+                    Autor: {g.autorNombre}
+                  </p>
+                )}
+                {g.registros.map(tarjetaRegistro)}
+              </div>
+            ))
+          )}
         </>
       )}
     </div>
