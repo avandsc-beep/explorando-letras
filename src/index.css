@@ -373,3 +373,54 @@ textarea {
   background: var(--ink-soft);
   border-top: 1px solid var(--ink-line);
 }
+
+/* ---- Panel Admin ---- */
+.el-admin-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.el-admin-tab {
+  flex: 1;
+  background: var(--ink-soft);
+  border: 1px solid var(--ink-line);
+  color: var(--paper-dim);
+  padding: 9px 0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+}
+
+.el-admin-tab-activo {
+  color: var(--ochre);
+  border-color: var(--ochre);
+}
+
+.el-admin-item {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 14px;
+}
+
+.el-admin-foto {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.el-admin-datos {
+  flex: 1;
+  min-width: 0;
+}
+
+.el-admin-linea {
+  font-size: 14px;
+  margin: 4px 0;
+  color: var(--paper);
+}

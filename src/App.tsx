@@ -3,12 +3,15 @@ import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { LoginPage } from './components/Auth/LoginPage'
 import { CapturePage } from './pages/CapturePage'
 import { MapaPage } from './pages/MapaPage'
+import { AdminPage } from './pages/AdminPage'
 
-type Vista = 'mapa' | 'registrar'
+type Vista = 'mapa' | 'registrar' | 'admin'
 
 function AppContenido() {
   const { user, perfil, cargando, cerrarSesion } = useAuth()
   const [vista, setVista] = useState<Vista>('mapa')
+
+  const esAdmin = perfil?.rol === 'admin' || perfil?.rol === 'moderador'
 
   if (cargando) {
     return (
@@ -41,7 +44,9 @@ function AppContenido() {
       ) : (
         <>
           <div className="el-vista-contenido">
-            {vista === 'mapa' ? <MapaPage /> : <CapturePage />}
+            {vista === 'mapa' && <MapaPage />}
+            {vista === 'registrar' && <CapturePage />}
+            {vista === 'admin' && esAdmin && <AdminPage />}
           </div>
 
           <nav className="el-tabbar">
@@ -61,6 +66,16 @@ function AppContenido() {
               <span className="el-tab-icono">📍</span>
               Registrar
             </button>
+            {esAdmin && (
+              <button
+                type="button"
+                className={`el-tab ${vista === 'admin' ? 'el-tab-activo' : ''}`}
+                onClick={() => setVista('admin')}
+              >
+                <span className="el-tab-icono">✅</span>
+                Admin
+              </button>
+            )}
           </nav>
         </>
       )}
