@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase, type Registro } from '../lib/supabase'
+import { UnirseEquipo } from '../components/UnirseEquipo'
 
 const ETIQUETAS_ESTADO: Record<Registro['estado'], string> = {
   borrador: 'Borrador (sin terminar)',
@@ -46,6 +47,8 @@ export function MisRegistrosPage() {
         Acá vas a ver siempre lo que registraste y en qué estado está — te confirma que se guardó
         correctamente.
       </p>
+
+      <UnirseEquipo />
 
       {error && <div className="el-error">{error}</div>}
 

@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css'
 import 'leaflet-draw'
 import 'leaflet-draw/dist/leaflet.draw.css'
 import { supabase } from '../lib/supabase'
+import { EquiposPanel } from '../components/EquiposPanel'
 
 import iconUrl from 'leaflet/dist/images/marker-icon.png'
 import iconShadowUrl from 'leaflet/dist/images/marker-shadow.png'
@@ -379,6 +380,8 @@ export function CampanasPage() {
       )}
 
       {cargando && <p className="el-hint">Cargando…</p>}
+
+      {campanaSeleccionada && <EquiposPanel campanaId={campanaSeleccionada} espacios={espacios} />}
     </div>
   )
 }
