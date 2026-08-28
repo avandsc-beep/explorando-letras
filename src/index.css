@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Caveat:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
   /* Paleta — pared de noche del casco viejo + colores de pintura vernácula */
@@ -13,7 +13,7 @@
   --brick: #b5482f;       /* rojo ladrillo / alerta */
   --leaf: #5a9c4a;        /* verde validación */
 
-  --font-display: 'Caveat', cursive;
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
   --font-sans: 'Space Grotesk', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
@@ -36,6 +36,8 @@ body {
   background: var(--ink);
   color: var(--paper);
   font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.45;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -71,10 +73,10 @@ textarea {
 
 .el-brand {
   font-family: var(--font-display);
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 700;
   color: var(--paper);
-  letter-spacing: 0.3px;
+  letter-spacing: -0.2px;
   display: flex;
   align-items: baseline;
   gap: 6px;
@@ -101,27 +103,27 @@ textarea {
 
 .el-title {
   font-family: var(--font-display);
-  font-size: 30px;
+  font-size: 26px;
   font-weight: 700;
-  margin: 0 0 4px;
+  margin: 0 0 6px;
   color: var(--paper);
 }
 
 .el-subtitle {
   color: var(--paper-dim);
-  font-size: 14px;
+  font-size: 16px;
   margin: 0 0 20px;
 }
 
 .el-field {
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 .el-label {
   display: block;
-  font-size: 13px;
+  font-size: 15px;
   color: var(--paper-dim);
-  margin-bottom: 6px;
+  margin-bottom: 7px;
   font-weight: 500;
 }
 
@@ -132,9 +134,9 @@ textarea {
   background: var(--ink);
   border: 1px solid var(--ink-line);
   border-radius: 8px;
-  padding: 11px 12px;
+  padding: 13px 14px;
   color: var(--paper);
-  font-size: 15px;
+  font-size: 17px;
 }
 
 .el-input:focus,
@@ -152,8 +154,8 @@ textarea {
   width: 100%;
   border: none;
   border-radius: 8px;
-  padding: 13px 16px;
-  font-size: 15px;
+  padding: 15px 16px;
+  font-size: 17px;
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.08s ease, opacity 0.15s ease;
@@ -199,14 +201,14 @@ textarea {
   background: rgba(181, 72, 47, 0.15);
   border: 1px solid var(--brick);
   color: #f0b8a8;
-  padding: 10px 12px;
+  padding: 11px 13px;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 15px;
   margin-bottom: 14px;
 }
 
 .el-hint {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--paper-dim);
   margin-top: 4px;
 }
@@ -216,7 +218,7 @@ textarea {
   align-items: center;
   gap: 10px;
   color: var(--paper-dim);
-  font-size: 12px;
+  font-size: 14px;
   margin: 16px 0;
 }
 
@@ -231,7 +233,7 @@ textarea {
 .el-link-row {
   text-align: center;
   margin-top: 16px;
-  font-size: 13px;
+  font-size: 15px;
   color: var(--paper-dim);
 }
 
@@ -240,7 +242,7 @@ textarea {
   border: none;
   color: var(--teal);
   cursor: pointer;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   padding: 0;
 }
@@ -280,4 +282,94 @@ textarea {
 .el-badge-rechazada {
   background: rgba(181, 72, 47, 0.18);
   color: var(--brick);
+}
+
+/* ---- Vista de contenido (deja espacio para el tabbar inferior) ---- */
+.el-vista-contenido {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding-bottom: 64px;
+}
+
+/* ---- Tabbar inferior ---- */
+.el-tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  background: var(--ink-soft);
+  border-top: 1px solid var(--ink-line);
+  z-index: 20;
+}
+
+.el-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--paper-dim);
+  padding: 10px 0 12px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.el-tab-icono {
+  font-size: 20px;
+}
+
+.el-tab-activo {
+  color: var(--ochre);
+}
+
+/* ---- Mapa público ---- */
+.el-mapa-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.el-mapa-filtros {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  overflow-x: auto;
+  background: var(--ink);
+  border-bottom: 1px solid var(--ink-line);
+}
+
+.el-select-compacto {
+  width: auto;
+  flex-shrink: 0;
+  padding: 8px 10px;
+  font-size: 14px;
+}
+
+.el-btn-limpiar {
+  width: auto;
+  flex-shrink: 0;
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+.el-mapa-canvas {
+  flex: 1;
+  min-height: 300px;
+}
+
+.el-mapa-contador {
+  text-align: center;
+  padding: 8px;
+  font-size: 13px;
+  color: var(--paper-dim);
+  background: var(--ink-soft);
+  border-top: 1px solid var(--ink-line);
 }

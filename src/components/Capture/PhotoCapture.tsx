@@ -122,7 +122,7 @@ export function PhotoCapture({ onFotoLista }: Props) {
           }}
         >
           <CameraIcon />
-          <span style={{ fontSize: 14 }}>Tomar o subir foto</span>
+          <span style={{ fontSize: 16 }}>Tomar o subir foto</span>
           <input
             type="file"
             accept="image/*"

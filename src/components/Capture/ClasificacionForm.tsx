@@ -198,9 +198,10 @@ const bloqueStyle: React.CSSProperties = {
 }
 
 const legendStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-display)',
-  fontSize: 19,
+  fontFamily: 'var(--font-sans)',
+  fontSize: 18,
+  fontWeight: 700,
   color: 'var(--ochre)',
   padding: 0,
-  marginBottom: 8,
+  marginBottom: 10,
 }

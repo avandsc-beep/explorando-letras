@@ -1,9 +1,14 @@
+import { useState } from 'react'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { LoginPage } from './components/Auth/LoginPage'
 import { CapturePage } from './pages/CapturePage'
+import { MapaPage } from './pages/MapaPage'
+
+type Vista = 'mapa' | 'registrar'
 
 function AppContenido() {
   const { user, perfil, cargando, cerrarSesion } = useAuth()
+  const [vista, setVista] = useState<Vista>('mapa')
 
   if (cargando) {
     return (
@@ -23,7 +28,7 @@ function AppContenido() {
           <button
             type="button"
             className="el-btn el-btn-danger"
-            style={{ width: 'auto', padding: '8px 14px', fontSize: 13 }}
+            style={{ width: 'auto', padding: '8px 14px', fontSize: 14 }}
             onClick={() => cerrarSesion()}
           >
             {perfil?.nombre_publico ?? 'Salir'}
@@ -31,7 +36,34 @@ function AppContenido() {
         )}
       </header>
 
-      {user ? <CapturePage /> : <LoginPage />}
+      {!user ? (
+        <LoginPage />
+      ) : (
+        <>
+          <div className="el-vista-contenido">
+            {vista === 'mapa' ? <MapaPage /> : <CapturePage />}
+          </div>
+
+          <nav className="el-tabbar">
+            <button
+              type="button"
+              className={`el-tab ${vista === 'mapa' ? 'el-tab-activo' : ''}`}
+              onClick={() => setVista('mapa')}
+            >
+              <span className="el-tab-icono">🗺️</span>
+              Mapa
+            </button>
+            <button
+              type="button"
+              className={`el-tab ${vista === 'registrar' ? 'el-tab-activo' : ''}`}
+              onClick={() => setVista('registrar')}
+            >
+              <span className="el-tab-icono">📍</span>
+              Registrar
+            </button>
+          </nav>
+        </>
+      )}
     </div>
   )
 }
