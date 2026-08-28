@@ -130,80 +130,99 @@ export function CampanasPage() {
   // Inicializar mapa + controles de dibujo una sola vez
   useEffect(() => {
     if (!mapDivRef.current || mapRef.current) return
-    const map = L.map(mapDivRef.current).setView([-17.7833, -63.1821], 15)
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap',
-    }).addTo(map)
 
-    const drawnItems = new L.FeatureGroup()
-    map.addLayer(drawnItems)
-    drawnItemsRef.current = drawnItems
+    try {
+      const map = L.map(mapDivRef.current).setView([-17.7833, -63.1821], 15)
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap',
+      }).addTo(map)
 
-    const drawControl = new L.Control.Draw({
-      draw: {
-        polygon: {
-          shapeOptions: { color: '#e0913f' },
-        },
-        marker: false,
-        circle: false,
-        circlemarker: false,
-        polyline: false,
-        rectangle: false,
-      },
-      edit: {
-        featureGroup: drawnItems,
-        remove: false,
-      },
-    })
-    map.addControl(drawControl)
+      const drawnItems = new L.FeatureGroup()
+      map.addLayer(drawnItems)
+      drawnItemsRef.current = drawnItems
 
-    map.on(L.Draw.Event.CREATED, async (e: L.LeafletEvent) => {
-      const layer = (e as L.DrawEvents.Created).layer as L.Polygon
-      const nombreEspacio = window.prompt('Nombre de este espacio (ej: "Manzana A")')
-      if (!nombreEspacio) return
+      mapRef.current = map
 
-      const latLngs = (layer.getLatLngs()[0] as L.LatLng[]).map((p) => ({
-        lat: p.lat,
-        lng: p.lng,
-      }))
+      // Fix de Leaflet: si el contenedor no tenía tamaño definido en el momento
+      // de crear el mapa (pasa al estar dentro de pestañas/tabs), hay que forzar
+      // el recálculo del tamaño una vez que el contenedor ya está visible.
+      const forzarRecalculoTamano = () => map.invalidateSize()
+      setTimeout(forzarRecalculoTamano, 100)
+      setTimeout(forzarRecalculoTamano, 400)
 
-      const campId = campanaSeleccionadaRef.current
-      if (!campId) {
-        window.alert('Elegí primero una campaña arriba.')
-        return
+      const observador = new ResizeObserver(forzarRecalculoTamano)
+      observador.observe(mapDivRef.current)
+
+      // El control de dibujo se agrega en un segundo paso, envuelto aparte,
+      // para que si algo falla acá el mapa base ya haya quedado visible.
+      try {
+        const drawControl = new L.Control.Draw({
+          draw: {
+            polygon: {
+              shapeOptions: { color: '#e0913f' },
+            },
+            marker: false,
+            circle: false,
+            circlemarker: false,
+            polyline: false,
+            rectangle: false,
+          },
+          edit: {
+            featureGroup: drawnItems,
+            remove: false,
+          },
+        })
+        map.addControl(drawControl)
+
+        map.on(L.Draw.Event.CREATED, async (e: L.LeafletEvent) => {
+          const layer = (e as L.DrawEvents.Created).layer as L.Polygon
+          const nombreEspacio = window.prompt('Nombre de este espacio (ej: "Manzana A")')
+          if (!nombreEspacio) return
+
+          const latLngs = (layer.getLatLngs()[0] as L.LatLng[]).map((p) => ({
+            lat: p.lat,
+            lng: p.lng,
+          }))
+
+          const campId = campanaSeleccionadaRef.current
+          if (!campId) {
+            window.alert('Elegí primero una campaña arriba.')
+            return
+          }
+
+          const { data, error: err } = await supabase
+            .from('espacios')
+            .insert({ campana_id: campId, nombre: nombreEspacio, poligono: latLngs })
+            .select()
+            .single()
+
+          if (err) {
+            setError('No se pudo guardar el espacio: ' + err.message)
+            return
+          }
+
+          drawnItems.addLayer(layer)
+          setEspacios((prev) => [...prev, data as Espacio])
+        })
+      } catch (errDraw) {
+        console.error('Error al inicializar el control de dibujo:', errDraw)
+        setError(
+          'El mapa cargó, pero la herramienta de dibujo no pudo activarse: ' +
+            (errDraw instanceof Error ? errDraw.message : String(errDraw)),
+        )
       }
 
-      const { data, error: err } = await supabase
-        .from('espacios')
-        .insert({ campana_id: campId, nombre: nombreEspacio, poligono: latLngs })
-        .select()
-        .single()
-
-      if (err) {
-        setError('No se pudo guardar el espacio: ' + err.message)
-        return
+      return () => {
+        observador.disconnect()
+        map.remove()
+        mapRef.current = null
       }
-
-      drawnItems.addLayer(layer)
-      setEspacios((prev) => [...prev, data as Espacio])
-    })
-
-    mapRef.current = map
-
-    // Fix de Leaflet: si el contenedor no tenía tamaño definido en el momento
-    // de crear el mapa (pasa al estar dentro de pestañas/tabs), hay que forzar
-    // el recálculo del tamaño una vez que el contenedor ya está visible.
-    const forzarRecalculoTamano = () => map.invalidateSize()
-    setTimeout(forzarRecalculoTamano, 100)
-    setTimeout(forzarRecalculoTamano, 400)
-
-    const observador = new ResizeObserver(forzarRecalculoTamano)
-    observador.observe(mapDivRef.current)
-
-    return () => {
-      observador.disconnect()
-      map.remove()
-      mapRef.current = null
+    } catch (errMapa) {
+      console.error('Error al inicializar el mapa:', errMapa)
+      setError(
+        'No se pudo cargar el mapa: ' + (errMapa instanceof Error ? errMapa.message : String(errMapa)),
+      )
+      return
     }
   }, [])
 
