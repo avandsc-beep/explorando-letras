@@ -7,6 +7,10 @@ import { ClasificacionForm, type DatosClasificacion } from '../components/Captur
 
 type Paso = 'foto' | 'ubicacion' | 'clasificacion' | 'guardado'
 
+interface Props {
+  onGuardado?: () => void
+}
+
 const CLASIFICACION_VACIA: DatosClasificacion = {
   ciudad: '',
   direccion_calle: '',
@@ -21,7 +25,7 @@ const CLASIFICACION_VACIA: DatosClasificacion = {
   texto_principal: '',
 }
 
-export function CapturePage() {
+export function CapturePage({ onGuardado }: Props) {
   const { user } = useAuth()
   const [paso, setPaso] = useState<Paso>('foto')
   const [fotoBlob, setFotoBlob] = useState<Blob | null>(null)
@@ -30,6 +34,7 @@ export function CapturePage() {
   const [clasificacion, setClasificacion] = useState<DatosClasificacion>(CLASIFICACION_VACIA)
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [estadoGuardado, setEstadoGuardado] = useState<'borrador' | 'completa' | null>(null)
 
   function onFotoLista(blob: Blob, previewUrl: string) {
     setFotoBlob(blob)
@@ -80,6 +85,7 @@ export function CapturePage() {
 
       if (errorInsert) throw errorInsert
 
+      setEstadoGuardado(estadoFinal)
       setPaso('guardado')
     } catch (e) {
       setError(e instanceof Error ? e.message : 'No se pudo guardar el registro.')
@@ -157,10 +163,39 @@ export function CapturePage() {
 
         {paso === 'guardado' && (
           <div>
-            <p style={{ color: 'var(--leaf)', fontWeight: 600 }}>✓ Registro guardado correctamente.</p>
-            <button type="button" className="el-btn el-btn-primary" onClick={empezarDeNuevo}>
-              Registrar otra pieza
-            </button>
+            <div
+              style={{
+                background: 'rgba(90, 156, 74, 0.15)',
+                border: '1px solid var(--leaf)',
+                borderRadius: 8,
+                padding: '14px 16px',
+                marginBottom: 16,
+              }}
+            >
+              <p style={{ color: 'var(--leaf)', fontWeight: 700, margin: '0 0 6px', fontSize: 17 }}>
+                ✓ Se subió correctamente a la base de datos
+              </p>
+              <p style={{ margin: 0, fontSize: 15 }}>
+                {estadoGuardado === 'borrador'
+                  ? 'Quedó guardado como borrador. Todavía tenés que completar la ficha y marcarla como "completa" para que pase a revisión — podés hacerlo cuando quieras desde "Mis registros".'
+                  : 'Quedó marcado como completo, esperando revisión del administrador. Vas a poder ver su estado en cualquier momento en "Mis registros".'}
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button type="button" className="el-btn el-btn-ghost" onClick={empezarDeNuevo}>
+                Registrar otra
+              </button>
+              <button
+                type="button"
+                className="el-btn el-btn-primary"
+                onClick={() => {
+                  empezarDeNuevo()
+                  onGuardado?.()
+                }}
+              >
+                Ver "Mis registros"
+              </button>
+            </div>
           </div>
         )}
       </div>

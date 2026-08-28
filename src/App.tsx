@@ -4,8 +4,9 @@ import { LoginPage } from './components/Auth/LoginPage'
 import { CapturePage } from './pages/CapturePage'
 import { MapaPage } from './pages/MapaPage'
 import { AdminPage } from './pages/AdminPage'
+import { MisRegistrosPage } from './pages/MisRegistrosPage'
 
-type Vista = 'mapa' | 'registrar' | 'admin'
+type Vista = 'mapa' | 'registrar' | 'mis-registros' | 'admin'
 
 function AppContenido() {
   const { user, perfil, cargando, cerrarSesion } = useAuth()
@@ -45,7 +46,8 @@ function AppContenido() {
         <>
           <div className="el-vista-contenido">
             {vista === 'mapa' && <MapaPage />}
-            {vista === 'registrar' && <CapturePage />}
+            {vista === 'registrar' && <CapturePage onGuardado={() => setVista('mis-registros')} />}
+            {vista === 'mis-registros' && <MisRegistrosPage />}
             {vista === 'admin' && esAdmin && <AdminPage />}
           </div>
 
@@ -65,6 +67,14 @@ function AppContenido() {
             >
               <span className="el-tab-icono">📍</span>
               Registrar
+            </button>
+            <button
+              type="button"
+              className={`el-tab ${vista === 'mis-registros' ? 'el-tab-activo' : ''}`}
+              onClick={() => setVista('mis-registros')}
+            >
+              <span className="el-tab-icono">📋</span>
+              Mis registros
             </button>
             {esAdmin && (
               <button
