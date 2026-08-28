@@ -424,3 +424,16 @@ textarea {
   margin: 4px 0;
   color: var(--paper);
 }
+
+/* ---- Mapa de dibujo de campañas (admin) ---- */
+.el-campanas-mapa {
+  width: 100%;
+  height: 380px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--ink-line);
+}
+
+.leaflet-draw-toolbar a {
+  background-color: var(--paper) !important;
+}

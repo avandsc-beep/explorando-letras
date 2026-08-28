@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase, type Registro } from '../lib/supabase'
+import { CampanasPage } from './CampanasPage'
 
 interface RegistroConAutor extends Registro {
   autor_nombre?: string
@@ -20,6 +21,7 @@ function generarIdUnico(ciudad: string): string {
 }
 
 export function AdminPage() {
+  const [seccion, setSeccion] = useState<'revision' | 'campanas'>('revision')
   const [registros, setRegistros] = useState<RegistroConAutor[]>([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -117,35 +119,57 @@ export function AdminPage() {
   return (
     <div className="el-main" style={{ paddingBottom: 90 }}>
       <h1 className="el-title">Panel admin</h1>
-      <p className="el-subtitle">Revisá y validá los registros antes de que aparezcan en el mapa público.</p>
 
-      <div className="el-admin-tabs">
+      <div className="el-admin-tabs" style={{ marginBottom: 14 }}>
         <button
           type="button"
-          className={`el-admin-tab ${filtroEstado === 'pendientes' ? 'el-admin-tab-activo' : ''}`}
-          onClick={() => setFiltroEstado('pendientes')}
+          className={`el-admin-tab ${seccion === 'revision' ? 'el-admin-tab-activo' : ''}`}
+          onClick={() => setSeccion('revision')}
         >
-          Pendientes
+          Revisión
         </button>
         <button
           type="button"
-          className={`el-admin-tab ${filtroEstado === 'validados' ? 'el-admin-tab-activo' : ''}`}
-          onClick={() => setFiltroEstado('validados')}
+          className={`el-admin-tab ${seccion === 'campanas' ? 'el-admin-tab-activo' : ''}`}
+          onClick={() => setSeccion('campanas')}
         >
-          Validados
-        </button>
-        <button
-          type="button"
-          className={`el-admin-tab ${filtroEstado === 'rechazados' ? 'el-admin-tab-activo' : ''}`}
-          onClick={() => setFiltroEstado('rechazados')}
-        >
-          Rechazados
+          Campañas
         </button>
       </div>
 
-      {error && <div className="el-error">{error}</div>}
+      {seccion === 'campanas' ? (
+        <CampanasPage />
+      ) : (
+        <>
+          <p className="el-subtitle">Revisá y validá los registros antes de que aparezcan en el mapa público.</p>
 
-      {cargando ? (
+          <div className="el-admin-tabs">
+            <button
+              type="button"
+              className={`el-admin-tab ${filtroEstado === 'pendientes' ? 'el-admin-tab-activo' : ''}`}
+              onClick={() => setFiltroEstado('pendientes')}
+            >
+              Pendientes
+            </button>
+            <button
+              type="button"
+              className={`el-admin-tab ${filtroEstado === 'validados' ? 'el-admin-tab-activo' : ''}`}
+              onClick={() => setFiltroEstado('validados')}
+            >
+              Validados
+            </button>
+            <button
+              type="button"
+              className={`el-admin-tab ${filtroEstado === 'rechazados' ? 'el-admin-tab-activo' : ''}`}
+              onClick={() => setFiltroEstado('rechazados')}
+            >
+              Rechazados
+            </button>
+          </div>
+
+          {error && <div className="el-error">{error}</div>}
+
+          {cargando ? (
         <p className="el-hint">Cargando…</p>
       ) : registros.length === 0 ? (
         <p className="el-hint">No hay registros en esta categoría.</p>
@@ -211,6 +235,8 @@ export function AdminPage() {
             </div>
           </div>
         ))
+      )}
+        </>
       )}
     </div>
   )
