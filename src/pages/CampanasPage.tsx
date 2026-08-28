@@ -190,7 +190,18 @@ export function CampanasPage() {
 
     mapRef.current = map
 
+    // Fix de Leaflet: si el contenedor no tenía tamaño definido en el momento
+    // de crear el mapa (pasa al estar dentro de pestañas/tabs), hay que forzar
+    // el recálculo del tamaño una vez que el contenedor ya está visible.
+    const forzarRecalculoTamano = () => map.invalidateSize()
+    setTimeout(forzarRecalculoTamano, 100)
+    setTimeout(forzarRecalculoTamano, 400)
+
+    const observador = new ResizeObserver(forzarRecalculoTamano)
+    observador.observe(mapDivRef.current)
+
     return () => {
+      observador.disconnect()
       map.remove()
       mapRef.current = null
     }

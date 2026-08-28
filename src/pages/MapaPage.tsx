@@ -98,7 +98,15 @@ export function MapaPage() {
     mapRef.current = map
     clusterRef.current = cluster
 
+    const forzarRecalculoTamano = () => map.invalidateSize()
+    setTimeout(forzarRecalculoTamano, 100)
+    setTimeout(forzarRecalculoTamano, 400)
+
+    const observador = new ResizeObserver(forzarRecalculoTamano)
+    if (mapDivRef.current) observador.observe(mapDivRef.current)
+
     return () => {
+      observador.disconnect()
       map.remove()
       mapRef.current = null
     }
