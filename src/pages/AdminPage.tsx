@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase, type Registro } from '../lib/supabase'
 import { CampanasPage } from './CampanasPage'
+import { ProgresoPanel } from '../components/ProgresoPanel'
 
 interface RegistroConAutor extends Registro {
   autor_nombre?: string
@@ -30,7 +31,7 @@ interface GrupoRevision {
 }
 
 export function AdminPage() {
-  const [seccion, setSeccion] = useState<'revision' | 'campanas'>('revision')
+  const [seccion, setSeccion] = useState<'revision' | 'campanas' | 'progreso'>('revision')
   const [registros, setRegistros] = useState<RegistroConAutor[]>([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -244,10 +245,24 @@ export function AdminPage() {
         >
           Campañas
         </button>
+        <button
+          type="button"
+          className={`el-admin-tab ${seccion === 'progreso' ? 'el-admin-tab-activo' : ''}`}
+          onClick={() => setSeccion('progreso')}
+        >
+          Progreso
+        </button>
       </div>
 
       {seccion === 'campanas' ? (
         <CampanasPage />
+      ) : seccion === 'progreso' ? (
+        <>
+          <p className="el-subtitle">
+            Cuánto lleva registrado cada equipo/estudiante, aunque todavía no haya entregado su informe.
+          </p>
+          <ProgresoPanel />
+        </>
       ) : (
         <>
           <p className="el-subtitle">Revisá y validá los registros antes de que aparezcan en el mapa público.</p>
