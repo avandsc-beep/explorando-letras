@@ -139,6 +139,46 @@ export function EquiposPanel({ campanaId, espacios }: Props) {
     setGuardando(false)
   }
 
+  const [espacioEditando, setEspacioEditando] = useState<string | null>(null)
+  const [seleccionEdicion, setSeleccionEdicion] = useState<string[]>([])
+  const [guardandoEdicion, setGuardandoEdicion] = useState(false)
+
+  function abrirEdicion(equipoId: string) {
+    setEspacioEditando(equipoId)
+    setSeleccionEdicion(espaciosPorEquipo[equipoId] ?? [])
+  }
+
+  function alternarEdicion(id: string) {
+    setSeleccionEdicion((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
+  }
+
+  async function guardarEdicionEspacios(equipoId: string) {
+    setGuardandoEdicion(true)
+    setError(null)
+
+    // Reemplazamos toda la relación: borramos las anteriores y creamos las nuevas
+    const { error: errDelete } = await supabase.from('equipo_espacios').delete().eq('equipo_id', equipoId)
+    if (errDelete) {
+      setError('No se pudieron actualizar los espacios: ' + errDelete.message)
+      setGuardandoEdicion(false)
+      return
+    }
+
+    if (seleccionEdicion.length > 0) {
+      const filas = seleccionEdicion.map((espacioId) => ({ equipo_id: equipoId, espacio_id: espacioId }))
+      const { error: errInsert } = await supabase.from('equipo_espacios').insert(filas)
+      if (errInsert) {
+        setError('No se pudieron guardar los nuevos espacios: ' + errInsert.message)
+        setGuardandoEdicion(false)
+        return
+      }
+    }
+
+    setEspaciosPorEquipo((prev) => ({ ...prev, [equipoId]: seleccionEdicion }))
+    setEspacioEditando(null)
+    setGuardandoEdicion(false)
+  }
+
   function copiarCodigo(codigo: string, equipoId: string) {
     navigator.clipboard?.writeText(codigo)
     setCopiadoId(equipoId)
@@ -237,6 +277,56 @@ export function EquiposPanel({ campanaId, espacios }: Props) {
               <p className="el-admin-linea">
                 <strong>Miembros:</strong> {miembrosPorEquipo[eq.id] ?? 0}
               </p>
+
+              {espacioEditando === eq.id ? (
+                <div style={{ marginTop: 8, marginBottom: 8 }}>
+                  {espacios.length === 0 ? (
+                    <p className="el-hint">Todavía no dibujaste espacios en el mapa de arriba.</p>
+                  ) : (
+                    espacios.map((esp) => (
+                      <label
+                        key={esp.id}
+                        style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 0', fontSize: 14 }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={seleccionEdicion.includes(esp.id)}
+                          onChange={() => alternarEdicion(esp.id)}
+                        />
+                        {esp.nombre}
+                      </label>
+                    ))
+                  )}
+                  <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                    <button
+                      type="button"
+                      className="el-btn el-btn-ghost"
+                      style={{ width: 'auto', padding: '6px 12px', fontSize: 13 }}
+                      onClick={() => setEspacioEditando(null)}
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="button"
+                      className="el-btn el-btn-primary"
+                      style={{ width: 'auto', padding: '6px 12px', fontSize: 13 }}
+                      disabled={guardandoEdicion}
+                      onClick={() => guardarEdicionEspacios(eq.id)}
+                    >
+                      {guardandoEdicion ? 'Guardando…' : 'Guardar espacios'}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  className="el-btn el-btn-ghost"
+                  style={{ width: 'auto', padding: '6px 12px', fontSize: 13, marginTop: 4 }}
+                  onClick={() => abrirEdicion(eq.id)}
+                >
+                  Editar espacios
+                </button>
+              )}
               <div
                 style={{
                   display: 'flex',

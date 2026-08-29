@@ -25,9 +25,16 @@ interface Filtros {
 
 const FILTROS_VACIOS: Filtros = { ciudad: '', tecnica: '', soporte: '', funcion: '' }
 
+function escapeHtml(texto: string): string {
+  const div = document.createElement('div')
+  div.textContent = texto
+  return div.innerHTML
+}
+
 export function MapaPage() {
   const [registros, setRegistros] = useState<Registro[]>([])
   const [lexicos, setLexicos] = useState<Lexico[]>([])
+  const [ciudadesDisponibles, setCiudadesDisponibles] = useState<string[]>([])
   const [filtros, setFiltros] = useState<Filtros>(FILTROS_VACIOS)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -44,6 +51,18 @@ export function MapaPage() {
       .select('*')
       .eq('activo', true)
       .then(({ data }) => setLexicos((data as Lexico[]) ?? []))
+
+    // Ciudades disponibles: se cargan una sola vez, sin depender de los
+    // filtros activos — así el desplegable no se va vaciando a medida que
+    // aplicás otros filtros.
+    supabase
+      .from('registros')
+      .select('ciudad')
+      .eq('estado', 'validada')
+      .then(({ data }) => {
+        const unicas = [...new Set((data as { ciudad: string }[] ?? []).map((r) => r.ciudad))]
+        setCiudadesDisponibles(unicas)
+      })
   }, [])
 
   // Cargar registros validados según los filtros activos
@@ -121,13 +140,16 @@ export function MapaPage() {
     cluster.clearLayers()
 
     for (const r of registros) {
-      const autor = autores[r.usuario_id] ?? 'Alguien'
+      const autor = escapeHtml(autores[r.usuario_id] ?? 'Alguien')
+      const idUnico = escapeHtml(r.id_unico ?? 'Pieza registrada')
+      const tecnica = escapeHtml(r.tecnica ?? '—')
+      const soporte = escapeHtml(r.soporte ?? '—')
       const popupHtml = `
         <div style="font-family: 'Space Grotesk', sans-serif; max-width: 220px;">
-          ${r.foto_url ? `<img src="${r.foto_url}" style="width:100%;border-radius:6px;margin-bottom:8px;" />` : ''}
-          <div style="font-weight:700;font-size:14px;margin-bottom:4px;">${r.id_unico ?? 'Pieza registrada'}</div>
+          ${r.foto_url ? `<img src="${escapeHtml(r.foto_url)}" style="width:100%;border-radius:6px;margin-bottom:8px;" />` : ''}
+          <div style="font-weight:700;font-size:14px;margin-bottom:4px;">${idUnico}</div>
           <div style="font-size:13px;color:#555;">
-            ${r.tecnica ?? '—'} · ${r.soporte ?? '—'}
+            ${tecnica} · ${soporte}
           </div>
           <div style="font-size:12px;color:#888;margin-top:6px;">Registrado por ${autor}</div>
         </div>
@@ -148,7 +170,7 @@ export function MapaPage() {
     return [...new Set(lexicos.filter((l) => l.categoria === categoria).map((l) => l.valor))]
   }
 
-  const ciudades = [...new Set(registros.map((r) => r.ciudad))]
+  const ciudades = ciudadesDisponibles
 
   return (
     <div className="el-mapa-wrap">
