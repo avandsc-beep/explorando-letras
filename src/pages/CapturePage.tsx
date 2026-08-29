@@ -15,6 +15,7 @@ interface OpcionInvestigacion {
   equipoId: string
   campanaId: string
   campanaNombre: string
+  campanaCiudad: string
   espacioId: string
   espacioNombre: string
 }
@@ -56,7 +57,7 @@ export function CapturePage({ onGuardado }: Props) {
       const { data, error: err } = await supabase
         .from('equipo_miembros')
         .select(
-          'equipo_id, equipos!inner(id, nombre, campana_id, campanas!inner(id, nombre, estado), equipo_espacios(espacio_id, espacios(id, nombre)))',
+          'equipo_id, equipos!inner(id, nombre, campana_id, campanas!inner(id, nombre, ciudad, estado), equipo_espacios(espacio_id, espacios(id, nombre)))',
         )
         .eq('usuario_id', user.id)
 
@@ -70,7 +71,7 @@ export function CapturePage({ onGuardado }: Props) {
         equipos: {
           nombre: string
           campana_id: string
-          campanas: { nombre: string; estado: string }
+          campanas: { nombre: string; ciudad: string; estado: string }
           equipo_espacios: { espacio_id: string; espacios: { id: string; nombre: string } | null }[]
         }
       }
@@ -84,6 +85,7 @@ export function CapturePage({ onGuardado }: Props) {
             equipoId: fila.equipo_id,
             campanaId: fila.equipos.campana_id,
             campanaNombre: fila.equipos.campanas.nombre,
+            campanaCiudad: fila.equipos.campanas.ciudad,
             espacioId: rel.espacios.id,
             espacioNombre: rel.espacios.nombre,
           })
@@ -108,6 +110,14 @@ export function CapturePage({ onGuardado }: Props) {
 
   async function guardar(estadoFinal: 'borrador' | 'completa') {
     if (!user || !fotoBlob || !ubicacion || !opcionElegida) return
+
+    if (estadoFinal === 'completa' && !esFichaMinimaCompleta()) {
+      setError(
+        'Para marcar como completa, necesitás al menos: ciudad, soporte, técnica y función. Completá esos campos o guardá como borrador.',
+      )
+      return
+    }
+
     setGuardando(true)
     setError(null)
 
@@ -129,7 +139,7 @@ export function CapturePage({ onGuardado }: Props) {
         campana_id: esInvestigacion ? opcionElegida.campanaId : null,
         espacio_id: esInvestigacion ? opcionElegida.espacioId : null,
         equipo_id: esInvestigacion ? opcionElegida.equipoId : null,
-        ciudad: clasificacion.ciudad || 'Santa Cruz de la Sierra',
+        ciudad: clasificacion.ciudad.trim(),
         latitud: ubicacion.lat,
         longitud: ubicacion.lng,
         precision_gps_metros: ubicacion.precisionMetros,
@@ -158,6 +168,15 @@ export function CapturePage({ onGuardado }: Props) {
     }
   }
 
+  function esFichaMinimaCompleta() {
+    return (
+      clasificacion.ciudad.trim() !== '' &&
+      clasificacion.soporte !== '' &&
+      clasificacion.tecnica !== '' &&
+      clasificacion.funcion !== ''
+    )
+  }
+
   function empezarDeNuevo() {
     setPaso('modo')
     setFotoBlob(null)
@@ -182,38 +201,53 @@ export function CapturePage({ onGuardado }: Props) {
               <p className="el-hint">Cargando…</p>
             ) : (
               <>
-                <p className="el-label" style={{ marginBottom: 10 }}>
-                  ¿En qué modo registrás esta pieza?
+                <p style={{ fontSize: 16, marginBottom: 16, color: 'var(--paper-dim)' }}>
+                  Vas a registrar una foto de una letra, cartel o rótulo que encontraste en la calle.
+                  Primero, elegí una de estas dos opciones:
                 </p>
+
                 <button
                   type="button"
                   className="el-btn el-btn-ghost"
-                  style={{ marginBottom: 10, textAlign: 'left' }}
+                  style={{ marginBottom: 12, textAlign: 'left', padding: '14px 16px', height: 'auto' }}
                   onClick={() => {
                     setOpcionElegida('personal')
                     setPaso('foto')
                   }}
                 >
-                  📍 Personal — captura libre, sin zona asignada
+                  <span style={{ display: 'block', fontWeight: 700, fontSize: 17, marginBottom: 4 }}>
+                    Registro libre
+                  </span>
+                  <span style={{ display: 'block', fontWeight: 400, fontSize: 14, color: 'var(--paper-dim)' }}>
+                    Elegí esta opción si no formás parte de ningún equipo, o si querés fotografiar algo
+                    fuera de tu zona asignada. Podés registrar cualquier letra, en cualquier lugar.
+                  </span>
                 </button>
 
                 {opciones.length > 0 && (
                   <>
-                    <p className="el-hint" style={{ margin: '4px 0 8px' }}>
-                      O elegí tu zona de investigación asignada:
+                    <p style={{ fontSize: 15, margin: '4px 0 10px', color: 'var(--paper-dim)' }}>
+                      También formás parte de un equipo de investigación. Si estás registrando piezas
+                      para el trabajo de tu equipo, elegí tu zona asignada:
                     </p>
                     {opciones.map((op) => (
                       <button
                         key={op.espacioId + op.equipoId}
                         type="button"
                         className="el-btn el-btn-ghost"
-                        style={{ marginBottom: 8, textAlign: 'left' }}
+                        style={{ marginBottom: 10, textAlign: 'left', padding: '14px 16px', height: 'auto' }}
                         onClick={() => {
                           setOpcionElegida(op)
+                          setClasificacion((prev) => ({ ...prev, ciudad: op.campanaCiudad }))
                           setPaso('foto')
                         }}
                       >
-                        🎓 {op.espacioNombre} — {op.campanaNombre}
+                        <span style={{ display: 'block', fontWeight: 700, fontSize: 17, marginBottom: 4 }}>
+                          Zona: {op.espacioNombre}
+                        </span>
+                        <span style={{ display: 'block', fontWeight: 400, fontSize: 14, color: 'var(--paper-dim)' }}>
+                          Campaña: {op.campanaNombre}
+                        </span>
                       </button>
                     ))}
                   </>
@@ -223,7 +257,15 @@ export function CapturePage({ onGuardado }: Props) {
           </>
         )}
 
-        {paso === 'foto' && <PhotoCapture onFotoLista={onFotoLista} />}
+        {paso === 'foto' && (
+          <>
+            <p style={{ fontSize: 15, marginBottom: 14, color: 'var(--paper-dim)' }}>
+              Sacá una foto de la letra o cartel, o subí una que ya tengas guardada. Encuadrala lo mejor
+              que puedas, sin gente ni autos tapándola.
+            </p>
+            <PhotoCapture onFotoLista={onFotoLista} />
+          </>
+        )}
 
         {paso === 'ubicacion' && (
           <>
@@ -234,6 +276,10 @@ export function CapturePage({ onGuardado }: Props) {
                 alt="Foto capturada"
               />
             )}
+            <p style={{ fontSize: 15, marginBottom: 10, color: 'var(--paper-dim)' }}>
+              Ahora necesitamos saber exactamente dónde está esta pieza. Tu celular va a buscar tu
+              ubicación automáticamente — dale permiso si te lo pide.
+            </p>
             <GeoCapture onUbicacionLista={onUbicacionLista} />
           </>
         )}
@@ -247,6 +293,10 @@ export function CapturePage({ onGuardado }: Props) {
                 alt="Foto capturada"
               />
             )}
+            <p style={{ fontSize: 15, marginBottom: 10, color: 'var(--paper-dim)' }}>
+              Por último, contanos algunos detalles de lo que fotografiaste. No hace falta que sepas
+              todas las respuestas — completá lo que puedas.
+            </p>
             <ClasificacionForm valores={clasificacion} onChange={setClasificacion} />
             <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
               <button
@@ -260,15 +310,16 @@ export function CapturePage({ onGuardado }: Props) {
               <button
                 type="button"
                 className="el-btn el-btn-primary"
-                disabled={guardando}
+                disabled={guardando || !esFichaMinimaCompleta()}
                 onClick={() => guardar('completa')}
               >
                 {guardando ? 'Guardando…' : 'Marcar como completa'}
               </button>
             </div>
             <p className="el-hint">
-              "Guardar borrador" si querés terminar la ficha más tarde. "Marcar como completa" cuando ya
-              está lista para incluir en tu informe.
+              {esFichaMinimaCompleta()
+                ? '"Guardar borrador" si querés terminar la ficha más tarde. "Marcar como completa" cuando ya está lista para incluir en tu informe.'
+                : 'Para marcar como completa, como mínimo completá: ciudad, soporte, técnica y función.'}
             </p>
           </>
         )}
@@ -285,7 +336,7 @@ export function CapturePage({ onGuardado }: Props) {
               }}
             >
               <p style={{ color: 'var(--leaf)', fontWeight: 700, margin: '0 0 6px', fontSize: 17 }}>
-                ✓ Se subió correctamente a la base de datos
+                Se guardó correctamente
               </p>
               <p style={{ margin: 0, fontSize: 15 }}>
                 {estadoGuardado === 'borrador'

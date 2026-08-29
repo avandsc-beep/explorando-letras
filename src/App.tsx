@@ -29,14 +29,17 @@ function AppContenido() {
           Explorando<span>Letras</span>
         </div>
         {user && (
-          <button
-            type="button"
-            className="el-btn el-btn-danger"
-            style={{ width: 'auto', padding: '8px 14px', fontSize: 14 }}
-            onClick={() => cerrarSesion()}
-          >
-            {perfil?.nombre_publico ?? 'Salir'}
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span className="el-hint" style={{ margin: 0 }}>{perfil?.nombre_publico}</span>
+            <button
+              type="button"
+              className="el-btn el-btn-danger"
+              style={{ width: 'auto', padding: '8px 14px', fontSize: 14 }}
+              onClick={() => cerrarSesion()}
+            >
+              Cerrar sesión
+            </button>
+          </div>
         )}
       </header>
 
@@ -57,7 +60,6 @@ function AppContenido() {
               className={`el-tab ${vista === 'mapa' ? 'el-tab-activo' : ''}`}
               onClick={() => setVista('mapa')}
             >
-              <span className="el-tab-icono">🗺️</span>
               Mapa
             </button>
             <button
@@ -65,7 +67,6 @@ function AppContenido() {
               className={`el-tab ${vista === 'registrar' ? 'el-tab-activo' : ''}`}
               onClick={() => setVista('registrar')}
             >
-              <span className="el-tab-icono">📍</span>
               Registrar
             </button>
             <button
@@ -73,7 +74,6 @@ function AppContenido() {
               className={`el-tab ${vista === 'mis-registros' ? 'el-tab-activo' : ''}`}
               onClick={() => setVista('mis-registros')}
             >
-              <span className="el-tab-icono">📋</span>
               Mis registros
             </button>
             {esAdmin && (
@@ -82,8 +82,7 @@ function AppContenido() {
                 className={`el-tab ${vista === 'admin' ? 'el-tab-activo' : ''}`}
                 onClick={() => setVista('admin')}
               >
-                <span className="el-tab-icono">✅</span>
-                Admin
+                Administrar
               </button>
             )}
           </nav>

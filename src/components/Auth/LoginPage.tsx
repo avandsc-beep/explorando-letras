@@ -38,12 +38,28 @@ export function LoginPage() {
 
   return (
     <div className="el-main">
+      <div
+        className="el-card"
+        style={{
+          marginBottom: 16,
+          background: 'rgba(230, 56, 136, 0.08)',
+          border: '1px solid rgba(230, 56, 136, 0.3)',
+        }}
+      >
+        <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6 }}>
+          <strong>¿Qué es Explorando Letras?</strong> Es un proyecto para guardar la memoria de las
+          letras hechas a mano que hay en la ciudad — carteles, nombres de negocios pintados, avisos
+          escritos a mano. Cualquier persona puede sacarles una foto, anotar dónde están, y sumarlas a un
+          mapa colectivo antes de que se pierdan.
+        </p>
+      </div>
+
       <div className="el-card">
         <h1 className="el-title">{modo === 'login' ? 'Ingresar' : 'Crear cuenta'}</h1>
         <p className="el-subtitle">
           {modo === 'login'
-            ? 'Iniciá sesión para registrar letragrafía en el mapa.'
-            : 'Sumate para aportar al archivo de letragrafía urbana.'}
+            ? 'Ingresá con tu cuenta para empezar a registrar letras en el mapa.'
+            : 'Creá tu cuenta gratis para empezar a sumar letras al mapa.'}
         </p>
 
         {error && <div className="el-error">{error}</div>}

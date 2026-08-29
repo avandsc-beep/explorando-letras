@@ -347,7 +347,7 @@ export function CampanasPage() {
 
       <p className="el-hint" style={{ marginBottom: 8 }}>
         {campanaSeleccionada
-          ? 'Usá el ícono de polígono (⬠) en la esquina del mapa para dibujar un espacio nuevo. Al cerrar el polígono, te va a pedir el nombre.'
+          ? 'Tocá el botón de dibujar polígono, en la esquina superior del mapa, para marcar un espacio nuevo. Al cerrar el polígono, te va a pedir el nombre.'
           : 'Elegí o creá una campaña arriba para empezar a dibujar espacios.'}
       </p>
       <div ref={mapDivRef} className="el-campanas-mapa" />

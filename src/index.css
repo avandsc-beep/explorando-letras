@@ -1,17 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-  /* Paleta — pared de noche del casco viejo + colores de pintura vernácula */
-  --ink: #15130f;         /* pared oscura de fondo */
-  --ink-soft: #1e1b16;    /* superficie de tarjeta sobre la pared */
-  --ink-line: #35302a;    /* líneas divisoras, bordes sutiles */
-  --paper: #f1e8d6;       /* texto principal, cal desgastada */
-  --paper-dim: #b7ac96;   /* texto secundario */
-  --ochre: #d19a3d;       /* pintura amarilla envejecida */
-  --teal: #2a9d92;        /* rótulo turquesa tipo "PARQUE" */
-  --magenta: #d43f7d;     /* rosa tipo "LETRAS" */
-  --brick: #b5482f;       /* rojo ladrillo / alerta */
-  --leaf: #5a9c4a;        /* verde validación */
+  /* Paleta simplificada: magenta como único acento, blanco como texto principal */
+  --ink: #15130f;         /* fondo oscuro */
+  --ink-soft: #201d18;    /* superficie de tarjeta */
+  --ink-line: #3a352e;    /* líneas divisorias, bordes */
+  --paper: #ffffff;       /* texto principal: blanco */
+  --paper-dim: #c9c2b4;   /* texto secundario */
+  --magenta: #e63888;     /* único color de acento: botones, links, títulos */
+  --brick: #c0392b;       /* rojo: solo para errores */
+  --leaf: #4a9d4a;        /* verde: solo para confirmaciones */
 
   --font-display: 'Space Grotesk', system-ui, sans-serif;
   --font-sans: 'Space Grotesk', system-ui, sans-serif;
@@ -36,8 +34,8 @@ body {
   background: var(--ink);
   color: var(--paper);
   font-family: var(--font-sans);
-  font-size: 16px;
-  line-height: 1.45;
+  font-size: 17px;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -49,7 +47,7 @@ textarea {
 }
 
 :focus-visible {
-  outline: 2px solid var(--teal);
+  outline: 2px solid var(--magenta);
   outline-offset: 2px;
 }
 
@@ -73,7 +71,7 @@ textarea {
 
 .el-brand {
   font-family: var(--font-display);
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 700;
   color: var(--paper);
   letter-spacing: -0.2px;
@@ -103,7 +101,7 @@ textarea {
 
 .el-title {
   font-family: var(--font-display);
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 700;
   margin: 0 0 6px;
   color: var(--paper);
@@ -111,7 +109,7 @@ textarea {
 
 .el-subtitle {
   color: var(--paper-dim);
-  font-size: 16px;
+  font-size: 17px;
   margin: 0 0 20px;
 }
 
@@ -121,7 +119,7 @@ textarea {
 
 .el-label {
   display: block;
-  font-size: 15px;
+  font-size: 16px;
   color: var(--paper-dim);
   margin-bottom: 7px;
   font-weight: 500;
@@ -142,7 +140,7 @@ textarea {
 .el-input:focus,
 .el-select:focus,
 .el-textarea:focus {
-  border-color: var(--teal);
+  border-color: var(--magenta);
 }
 
 .el-textarea {
@@ -171,7 +169,7 @@ textarea {
 }
 
 .el-btn-primary {
-  background: var(--ochre);
+  background: var(--magenta);
   color: var(--ink);
 }
 
@@ -187,7 +185,7 @@ textarea {
 
 .el-btn-ghost {
   background: transparent;
-  color: var(--teal);
+  color: var(--magenta);
   border: 1px solid var(--ink-line);
 }
 
@@ -198,17 +196,17 @@ textarea {
 }
 
 .el-error {
-  background: rgba(181, 72, 47, 0.15);
+  background: rgba(192, 57, 43, 0.15);
   border: 1px solid var(--brick);
   color: #f0b8a8;
   padding: 11px 13px;
   border-radius: 8px;
-  font-size: 15px;
+  font-size: 16px;
   margin-bottom: 14px;
 }
 
 .el-hint {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--paper-dim);
   margin-top: 4px;
 }
@@ -218,7 +216,7 @@ textarea {
   align-items: center;
   gap: 10px;
   color: var(--paper-dim);
-  font-size: 14px;
+  font-size: 15px;
   margin: 16px 0;
 }
 
@@ -233,16 +231,16 @@ textarea {
 .el-link-row {
   text-align: center;
   margin-top: 16px;
-  font-size: 15px;
+  font-size: 16px;
   color: var(--paper-dim);
 }
 
 .el-link-row button {
   background: none;
   border: none;
-  color: var(--teal);
+  color: var(--magenta);
   cursor: pointer;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   padding: 0;
 }
@@ -251,36 +249,36 @@ textarea {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 3px 9px;
+  padding: 4px 10px;
   border-radius: 100px;
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
 .el-badge-borrador {
-  background: rgba(183, 172, 150, 0.15);
+  background: rgba(201, 194, 180, 0.18);
   color: var(--paper-dim);
 }
 
 .el-badge-completa {
-  background: rgba(209, 154, 61, 0.18);
-  color: var(--ochre);
+  background: rgba(230, 56, 136, 0.18);
+  color: var(--magenta);
 }
 
 .el-badge-pendiente_revision {
-  background: rgba(42, 157, 146, 0.18);
-  color: var(--teal);
+  background: rgba(230, 56, 136, 0.18);
+  color: var(--magenta);
 }
 
 .el-badge-validada {
-  background: rgba(90, 156, 74, 0.18);
+  background: rgba(74, 157, 74, 0.18);
   color: var(--leaf);
 }
 
 .el-badge-rechazada {
-  background: rgba(181, 72, 47, 0.18);
+  background: rgba(192, 57, 43, 0.18);
   color: var(--brick);
 }
 
@@ -326,7 +324,7 @@ textarea {
 }
 
 .el-tab-activo {
-  color: var(--ochre);
+  color: var(--magenta);
 }
 
 /* ---- Mapa público ---- */
@@ -395,8 +393,8 @@ textarea {
 }
 
 .el-admin-tab-activo {
-  color: var(--ochre);
-  border-color: var(--ochre);
+  color: var(--magenta);
+  border-color: var(--magenta);
 }
 
 .el-admin-item {

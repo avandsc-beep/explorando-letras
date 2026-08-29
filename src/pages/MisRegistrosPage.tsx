@@ -121,7 +121,7 @@ export function MisRegistrosPage() {
         <div
           key={grupo.campanaId}
           className="el-card"
-          style={{ marginBottom: 16, border: '1px solid var(--ochre)' }}
+          style={{ marginBottom: 16, border: '1px solid var(--magenta)' }}
         >
           <p style={{ fontWeight: 700, fontSize: 16, margin: '0 0 6px' }}>
             {grupo.campanaNombre} — {grupo.registros.length} pieza
@@ -154,7 +154,7 @@ export function MisRegistrosPage() {
             <div className="el-admin-datos">
               <span className={`el-badge el-badge-${r.estado}`}>{r.estado.replace('_', ' ')}</span>{' '}
               <span className="el-badge" style={{ color: 'var(--paper-dim)', background: 'transparent', border: '1px solid var(--ink-line)' }}>
-                {r.origen === 'investigacion' ? '🎓 Investigación' : '📍 Personal'}
+                {r.origen === 'investigacion' ? 'Investigación' : 'Personal'}
               </span>
               <p className="el-admin-linea" style={{ marginTop: 6 }}>
                 {r.origen === 'investigacion' && r.estado === 'completa'
@@ -173,7 +173,7 @@ export function MisRegistrosPage() {
                 </p>
               )}
               {r.estado === 'borrador' && (
-                <p className="el-admin-linea" style={{ color: 'var(--ochre)' }}>
+                <p className="el-admin-linea" style={{ color: 'var(--magenta)' }}>
                   Falta completar la ficha de clasificación para que se pueda revisar.
                 </p>
               )}

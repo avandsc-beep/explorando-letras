@@ -174,6 +174,9 @@ export function MapaPage() {
 
   return (
     <div className="el-mapa-wrap">
+      <p style={{ fontSize: 14, color: 'var(--paper-dim)', margin: '10px 16px 0' }}>
+        Cada punto del mapa es una letra o cartel que alguien registró. Tocalo para ver la foto.
+      </p>
       <div className="el-mapa-filtros">
         <select
           className="el-select el-select-compacto"
@@ -192,7 +195,7 @@ export function MapaPage() {
           value={filtros.tecnica}
           onChange={(e) => setFiltros({ ...filtros, tecnica: e.target.value })}
         >
-          <option value="">Técnica</option>
+          <option value="">Todas las técnicas</option>
           {opciones('tecnica').map((o) => (
             <option key={o} value={o}>
               {o}
@@ -204,7 +207,7 @@ export function MapaPage() {
           value={filtros.soporte}
           onChange={(e) => setFiltros({ ...filtros, soporte: e.target.value })}
         >
-          <option value="">Soporte</option>
+          <option value="">Todos los soportes</option>
           {opciones('soporte').map((o) => (
             <option key={o} value={o}>
               {o}
@@ -216,7 +219,7 @@ export function MapaPage() {
           value={filtros.funcion}
           onChange={(e) => setFiltros({ ...filtros, funcion: e.target.value })}
         >
-          <option value="">Función</option>
+          <option value="">Todas las funciones</option>
           {opciones('funcion').map((o) => (
             <option key={o} value={o}>
               {o}

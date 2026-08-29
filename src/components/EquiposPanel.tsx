@@ -348,7 +348,7 @@ export function EquiposPanel({ campanaId, espacios }: Props) {
                   style={{ width: 'auto', padding: '6px 12px', fontSize: 13 }}
                   onClick={() => copiarCodigo(eq.codigo_invitacion, eq.id)}
                 >
-                  {copiadoId === eq.id ? '✓ Copiado' : 'Copiar código'}
+                  {copiadoId === eq.id ? 'Copiado' : 'Copiar código'}
                 </button>
               </div>
             </div>

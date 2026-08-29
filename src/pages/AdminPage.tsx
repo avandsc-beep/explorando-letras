@@ -304,14 +304,14 @@ export function AdminPage() {
                   <div
                     style={{
                       background: 'var(--ink-soft)',
-                      border: '1px solid var(--ochre)',
+                      border: '1px solid var(--magenta)',
                       borderRadius: 8,
                       padding: '8px 12px',
                       marginBottom: 8,
                       fontSize: 14,
                     }}
                   >
-                    📋 Informe de <strong>{g.autorNombre}</strong>
+                    Informe de <strong>{g.autorNombre}</strong>
                     {g.campanaNombre ? ` — ${g.campanaNombre}` : ''} · {g.registros.length} pieza
                     {g.registros.length === 1 ? '' : 's'}
                   </div>

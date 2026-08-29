@@ -121,8 +121,8 @@ export function PhotoCapture({ onFotoLista }: Props) {
             color: 'var(--paper-dim)',
           }}
         >
-          <CameraIcon />
-          <span style={{ fontSize: 16 }}>Tomar o subir foto</span>
+          <span style={{ fontSize: 17, fontWeight: 700, color: 'var(--magenta)' }}>Tomar o subir foto</span>
+          <span style={{ fontSize: 14 }}>Tocá acá para abrir la cámara o elegir una imagen</span>
           <input
             type="file"
             accept="image/*"
@@ -194,14 +194,5 @@ export function PhotoCapture({ onFotoLista }: Props) {
         </button>
       </div>
     </div>
-  )
-}
-
-function CameraIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-      <path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V9a1 1 0 011-1z" />
-      <circle cx="12" cy="14" r="3.5" />
-    </svg>
   )
 }
