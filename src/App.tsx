@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { LoginPage } from './components/Auth/LoginPage'
 import { CapturePage } from './pages/CapturePage'
-import { MapaPage } from './pages/MapaPage'
+import { ExplorarPage } from './pages/ExplorarPage'
 import { AdminPage } from './pages/AdminPage'
 import { MisRegistrosPage } from './pages/MisRegistrosPage'
 
@@ -25,12 +25,12 @@ function AppContenido() {
   // El mapa es público: cualquier persona puede verlo sin necesidad de una cuenta.
   // Registrar, ver "Mis registros" y administrar sí requieren haber ingresado.
   function contenidoPrincipal() {
-    if (vista === 'mapa') return <MapaPage />
+    if (vista === 'mapa') return <ExplorarPage />
     if (!user) return <LoginPage />
     if (vista === 'registrar') return <CapturePage onGuardado={() => setVista('mis-registros')} />
     if (vista === 'mis-registros') return <MisRegistrosPage />
     if (vista === 'admin' && esAdmin) return <AdminPage />
-    return <MapaPage />
+    return <ExplorarPage />
   }
 
   return (
@@ -71,7 +71,7 @@ function AppContenido() {
           className={`el-tab ${vista === 'mapa' ? 'el-tab-activo' : ''}`}
           onClick={() => setVista('mapa')}
         >
-          Mapa
+          Explorar
         </button>
         <button
           type="button"
