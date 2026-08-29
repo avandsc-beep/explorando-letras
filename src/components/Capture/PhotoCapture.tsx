@@ -49,6 +49,7 @@ export function PhotoCapture({ onFotoLista }: Props) {
       viewMode: 1,
       autoCropArea: 0.9,
       background: false,
+      aspectRatio: 5 / 4, // horizontal fijo 5:4, para que todas las fotos queden uniformes en la diagramación
     })
     cropperRef.current = cropper
     return () => {
@@ -60,8 +61,9 @@ export function PhotoCapture({ onFotoLista }: Props) {
   function confirmarRecorte() {
     const cropper = cropperRef.current
     if (!cropper) return
-    const canvas = cropper.getCroppedCanvas({ maxWidth: 2000, maxHeight: 2000 })
-    setImagenRecortadaUrl(canvas.toDataURL('image/jpeg', 0.92))
+    // Alta resolución para impresión: 3000x2400px a 300dpi = 25x20cm de tamaño final
+    const canvas = cropper.getCroppedCanvas({ maxWidth: 3000, maxHeight: 2400 })
+    setImagenRecortadaUrl(canvas.toDataURL('image/jpeg', 0.95))
     setEtapa('ajustar')
   }
 
@@ -87,10 +89,10 @@ export function PhotoCapture({ onFotoLista }: Props) {
     if (!canvas) return
     canvas.toBlob(
       (blob) => {
-        if (blob) onFotoLista(blob, canvas.toDataURL('image/jpeg', 0.92))
+        if (blob) onFotoLista(blob, canvas.toDataURL('image/jpeg', 0.95))
       },
       'image/jpeg',
-      0.92
+      0.95
     )
   }
 
@@ -139,6 +141,10 @@ export function PhotoCapture({ onFotoLista }: Props) {
     return (
       <div className="el-field">
         <label className="el-label">Encuadrá la pieza</label>
+        <p className="el-hint" style={{ marginTop: -4, marginBottom: 8 }}>
+          El recorte queda siempre en el mismo formato horizontal, para que todas las fotos se vean
+          parejas en el archivo final. Movete y agrandá el recuadro hasta que la letra quede bien centrada.
+        </p>
         {avisoCalidad && <div className="el-error">{avisoCalidad}</div>}
         <div style={{ maxHeight: 360, overflow: 'hidden', borderRadius: 8 }}>
           <img ref={imgRef} src={imagenOriginalUrl ?? ''} style={{ maxWidth: '100%' }} />

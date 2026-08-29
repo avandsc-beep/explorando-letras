@@ -22,13 +22,24 @@ function AppContenido() {
     )
   }
 
+  // El mapa es público: cualquier persona puede verlo sin necesidad de una cuenta.
+  // Registrar, ver "Mis registros" y administrar sí requieren haber ingresado.
+  function contenidoPrincipal() {
+    if (vista === 'mapa') return <MapaPage />
+    if (!user) return <LoginPage />
+    if (vista === 'registrar') return <CapturePage onGuardado={() => setVista('mis-registros')} />
+    if (vista === 'mis-registros') return <MisRegistrosPage />
+    if (vista === 'admin' && esAdmin) return <AdminPage />
+    return <MapaPage />
+  }
+
   return (
     <div className="el-app">
       <header className="el-header">
         <div className="el-brand">
           Explorando<span>Letras</span>
         </div>
-        {user && (
+        {user ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <span className="el-hint" style={{ margin: 0 }}>{perfil?.nombre_publico}</span>
             <button
@@ -40,54 +51,52 @@ function AppContenido() {
               Cerrar sesión
             </button>
           </div>
+        ) : (
+          <button
+            type="button"
+            className="el-btn el-btn-primary"
+            style={{ width: 'auto', padding: '8px 14px', fontSize: 14 }}
+            onClick={() => setVista('registrar')}
+          >
+            Ingresar
+          </button>
         )}
       </header>
 
-      {!user ? (
-        <LoginPage />
-      ) : (
-        <>
-          <div className="el-vista-contenido">
-            {vista === 'mapa' && <MapaPage />}
-            {vista === 'registrar' && <CapturePage onGuardado={() => setVista('mis-registros')} />}
-            {vista === 'mis-registros' && <MisRegistrosPage />}
-            {vista === 'admin' && esAdmin && <AdminPage />}
-          </div>
+      <div className="el-vista-contenido">{contenidoPrincipal()}</div>
 
-          <nav className="el-tabbar">
-            <button
-              type="button"
-              className={`el-tab ${vista === 'mapa' ? 'el-tab-activo' : ''}`}
-              onClick={() => setVista('mapa')}
-            >
-              Mapa
-            </button>
-            <button
-              type="button"
-              className={`el-tab ${vista === 'registrar' ? 'el-tab-activo' : ''}`}
-              onClick={() => setVista('registrar')}
-            >
-              Registrar
-            </button>
-            <button
-              type="button"
-              className={`el-tab ${vista === 'mis-registros' ? 'el-tab-activo' : ''}`}
-              onClick={() => setVista('mis-registros')}
-            >
-              Mis registros
-            </button>
-            {esAdmin && (
-              <button
-                type="button"
-                className={`el-tab ${vista === 'admin' ? 'el-tab-activo' : ''}`}
-                onClick={() => setVista('admin')}
-              >
-                Administrar
-              </button>
-            )}
-          </nav>
-        </>
-      )}
+      <nav className="el-tabbar">
+        <button
+          type="button"
+          className={`el-tab ${vista === 'mapa' ? 'el-tab-activo' : ''}`}
+          onClick={() => setVista('mapa')}
+        >
+          Mapa
+        </button>
+        <button
+          type="button"
+          className={`el-tab ${vista === 'registrar' ? 'el-tab-activo' : ''}`}
+          onClick={() => setVista('registrar')}
+        >
+          Registrar
+        </button>
+        <button
+          type="button"
+          className={`el-tab ${vista === 'mis-registros' ? 'el-tab-activo' : ''}`}
+          onClick={() => setVista('mis-registros')}
+        >
+          Mis registros
+        </button>
+        {user && esAdmin && (
+          <button
+            type="button"
+            className={`el-tab ${vista === 'admin' ? 'el-tab-activo' : ''}`}
+            onClick={() => setVista('admin')}
+          >
+            Administrar
+          </button>
+        )}
+      </nav>
     </div>
   )
 }
