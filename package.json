@@ -13,6 +13,7 @@
     "@supabase/supabase-js": "^2.112.4",
     "@types/leaflet": "^1.9.22",
     "cropperjs": "^1.6.2",
+    "jszip": "^3.10.1",
     "leaflet": "^1.9.4",
     "leaflet-draw": "^1.0.4",
     "leaflet.markercluster": "^1.5.3",
@@ -22,6 +23,7 @@
     "react-router-dom": "^7.18.2"
   },
   "devDependencies": {
+    "@types/jszip": "^3.4.0",
     "@types/leaflet-draw": "^1.0.13",
     "@types/leaflet.markercluster": "^1.5.6",
     "@types/node": "^24.13.3",

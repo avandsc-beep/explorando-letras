@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase, type Registro } from '../lib/supabase'
 import { CampanasPage } from './CampanasPage'
 import { ProgresoPanel } from '../components/ProgresoPanel'
+import { ExportarPanel } from '../components/ExportarPanel'
 
 interface RegistroConAutor extends Registro {
   autor_nombre?: string
@@ -31,7 +32,7 @@ interface GrupoRevision {
 }
 
 export function AdminPage() {
-  const [seccion, setSeccion] = useState<'revision' | 'campanas' | 'progreso'>('revision')
+  const [seccion, setSeccion] = useState<'revision' | 'campanas' | 'progreso' | 'exportar'>('revision')
   const [registros, setRegistros] = useState<RegistroConAutor[]>([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -252,6 +253,13 @@ export function AdminPage() {
         >
           Progreso
         </button>
+        <button
+          type="button"
+          className={`el-admin-tab ${seccion === 'exportar' ? 'el-admin-tab-activo' : ''}`}
+          onClick={() => setSeccion('exportar')}
+        >
+          Exportar
+        </button>
       </div>
 
       {seccion === 'campanas' ? (
@@ -262,6 +270,14 @@ export function AdminPage() {
             Cuánto lleva registrado cada equipo/estudiante, aunque todavía no haya entregado su informe.
           </p>
           <ProgresoPanel />
+        </>
+      ) : seccion === 'exportar' ? (
+        <>
+          <p className="el-subtitle">
+            Descargá las fotos y los datos de las piezas validadas, listos para análisis o para diagramar
+            una publicación impresa.
+          </p>
+          <ExportarPanel />
         </>
       ) : (
         <>
