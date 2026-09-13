@@ -68,8 +68,8 @@ export function LoginPage() {
         className="el-card"
         style={{
           marginBottom: 16,
-          background: 'rgba(230, 56, 136, 0.08)',
-          border: '1px solid rgba(230, 56, 136, 0.3)',
+          background: 'rgba(149, 27, 129, 0.10)',
+          border: '1px solid rgba(149, 27, 129, 0.35)',
         }}
       >
         <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6 }}>

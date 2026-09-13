@@ -30,8 +30,8 @@ export function ExplorarPage({ onRegistrar }: Props) {
           className="el-card"
           style={{
             margin: '12px 16px 0',
-            background: 'rgba(230, 56, 136, 0.08)',
-            border: '1px solid rgba(230, 56, 136, 0.3)',
+            background: 'rgba(149, 27, 129, 0.10)',
+            border: '1px solid rgba(149, 27, 129, 0.35)',
           }}
         >
           <p style={{ margin: '0 0 10px', fontSize: 17, fontWeight: 700 }}>¿Qué es Explorando Letras?</p>

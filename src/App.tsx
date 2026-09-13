@@ -45,9 +45,9 @@ function AppContenido() {
       <header className="el-header">
         <button type="button" className="el-brand" onClick={() => irA('mapa')} style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}>
           <img
-            src="/assets/logo-letras-solo.png"
+            src="/assets/logo-explorando-letras-full.png"
             alt="Explorando Letras"
-            style={{ height: 30, width: 'auto', display: 'block' }}
+            style={{ height: 40, width: 'auto', display: 'block' }}
           />
         </button>
 
