@@ -34,7 +34,9 @@ export function GeoCapture({ onUbicacionLista }: Props) {
   const markerRef = useRef<L.Marker | null>(null)
   const circleRef = useRef<L.Circle | null>(null)
 
-  useEffect(() => {
+  function buscarUbicacion() {
+    setEstado('buscando')
+    setErrorMsg(null)
     if (!navigator.geolocation) {
       setErrorMsg('Este navegador no soporta geolocalización.')
       setEstado('error')
@@ -53,13 +55,18 @@ export function GeoCapture({ onUbicacionLista }: Props) {
       (err) => {
         setErrorMsg(
           err.code === err.PERMISSION_DENIED
-            ? 'No se otorgó permiso de ubicación. Habilitalo en la configuración del navegador para continuar.'
-            : 'No se pudo obtener la ubicación. Intentá de nuevo.'
+            ? 'No se otorgó permiso de ubicación. Habilitalo en la configuración del navegador y volvé a intentar.'
+            : 'No se pudo obtener la ubicación. Revisá tu conexión y volvé a intentar.'
         )
         setEstado('error')
       },
       { enableHighAccuracy: true, timeout: 15000 }
     )
+  }
+
+  useEffect(() => {
+    buscarUbicacion()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Montar el mapa una vez que tenemos una ubicación inicial
@@ -90,6 +97,10 @@ export function GeoCapture({ onUbicacionLista }: Props) {
     mapRef.current = map
     markerRef.current = marker
 
+    const forzarRecalculoTamano = () => map.invalidateSize()
+    setTimeout(forzarRecalculoTamano, 100)
+    setTimeout(forzarRecalculoTamano, 400)
+
     return () => {
       map.remove()
       mapRef.current = null
@@ -101,11 +112,26 @@ export function GeoCapture({ onUbicacionLista }: Props) {
   }
 
   if (estado === 'buscando') {
-    return <div className="el-hint">Obteniendo tu ubicación…</div>
+    return (
+      <div className="el-field">
+        <p className="el-hint" style={{ marginBottom: 8 }}>
+          Es normal que tu celular te pregunte si puede usar tu ubicación — es para saber dónde está la
+          pieza que fotografiaste. Tocá "Permitir" para poder continuar.
+        </p>
+        <div className="el-hint">Obteniendo tu ubicación…</div>
+      </div>
+    )
   }
 
   if (estado === 'error') {
-    return <div className="el-error">{errorMsg}</div>
+    return (
+      <div className="el-field">
+        <div className="el-error">{errorMsg}</div>
+        <button type="button" className="el-btn el-btn-primary" style={{ marginTop: 10 }} onClick={buscarUbicacion}>
+          Reintentar
+        </button>
+      </div>
+    )
   }
 
   return (
@@ -123,8 +149,14 @@ export function GeoCapture({ onUbicacionLista }: Props) {
           ? `Precisión estimada: ±${Math.round(ubicacion.precisionMetros)}m. Arrastrá el pin si no cae en el lugar correcto.`
           : 'Arrastrá el pin para ajustar la ubicación.'}
       </p>
-      <button type="button" className="el-btn el-btn-primary" style={{ marginTop: 8 }} onClick={confirmar}>
-        Confirmar ubicación
+      <button
+        type="button"
+        className="el-btn el-btn-primary"
+        style={{ marginTop: 8 }}
+        disabled={estado === 'ajuste_requerido'}
+        onClick={confirmar}
+      >
+        {estado === 'ajuste_requerido' ? 'Arrastrá el pin para continuar' : 'Confirmar ubicación'}
       </button>
     </div>
   )

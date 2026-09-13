@@ -8,7 +8,7 @@ interface Filtros {
   funcion: string
 }
 
-type Agrupacion = 'ninguna' | 'tecnica' | 'funcion' | 'campana'
+type Agrupacion = 'ninguna' | 'ciudad' | 'fecha' | 'tecnica' | 'soporte' | 'funcion' | 'campana'
 
 const FILTROS_VACIOS: Filtros = { ciudad: '', tecnica: '', soporte: '', funcion: '' }
 
@@ -103,7 +103,13 @@ export function GaleriaPage() {
   }
 
   function claveDeGrupo(r: RegistroConDatos): string {
+    if (agrupacion === 'ciudad') return r.ciudad || 'Ciudad sin especificar'
+    if (agrupacion === 'fecha') {
+      const fecha = new Date(r.fecha_registro)
+      return fecha.toLocaleDateString('es-BO', { month: 'long', year: 'numeric' })
+    }
     if (agrupacion === 'tecnica') return r.tecnica || 'Sin técnica registrada'
+    if (agrupacion === 'soporte') return r.soporte || 'Sin soporte registrado'
     if (agrupacion === 'funcion') return r.funcion || 'Sin función registrada'
     if (agrupacion === 'campana') return r.campana_nombre || 'Aporte personal (sin campaña)'
     return ''
@@ -122,7 +128,16 @@ export function GaleriaPage() {
       }
       grupo.items.push(r)
     }
-    grupos.sort((a, b) => a.titulo.localeCompare(b.titulo))
+    if (agrupacion === 'fecha') {
+      // Orden cronológico (más reciente primero), no alfabético
+      grupos.sort((a, b) => {
+        const fechaA = new Date(a.items[0].fecha_registro).getTime()
+        const fechaB = new Date(b.items[0].fecha_registro).getTime()
+        return fechaB - fechaA
+      })
+    } else {
+      grupos.sort((a, b) => a.titulo.localeCompare(b.titulo))
+    }
   }
 
   return (
@@ -187,7 +202,10 @@ export function GaleriaPage() {
         <label className="el-label">Ordenar el catálogo por</label>
         <select className="el-select" value={agrupacion} onChange={(e) => setAgrupacion(e.target.value as Agrupacion)}>
           <option value="ninguna">Más recientes primero</option>
+          <option value="fecha">Agrupar por fecha</option>
+          <option value="ciudad">Agrupar por ciudad</option>
           <option value="tecnica">Agrupar por técnica</option>
+          <option value="soporte">Agrupar por soporte</option>
           <option value="funcion">Agrupar por función</option>
           <option value="campana">Agrupar por campaña</option>
         </select>
@@ -234,6 +252,16 @@ export function GaleriaPage() {
       {piezaSeleccionada && (
         <div className="el-modal-overlay" onClick={() => setPiezaSeleccionada(null)}>
           <div className="el-modal" onClick={(e) => e.stopPropagation()}>
+            <div style={{ padding: '12px 18px 0', textAlign: 'right' }}>
+              <button
+                type="button"
+                className="el-btn el-btn-ghost"
+                style={{ width: 'auto', padding: '6px 14px', fontSize: 14 }}
+                onClick={() => setPiezaSeleccionada(null)}
+              >
+                Cerrar
+              </button>
+            </div>
             {piezaSeleccionada.foto_url && (
               <img src={piezaSeleccionada.foto_url} alt="" className="el-modal-foto" />
             )}

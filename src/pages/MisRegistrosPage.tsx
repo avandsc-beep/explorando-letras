@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase, type Registro } from '../lib/supabase'
 import { UnirseEquipo } from '../components/UnirseEquipo'
+import { EditarRegistroPage } from './EditarRegistroPage'
 
 const ETIQUETAS_ESTADO: Record<Registro['estado'], string> = {
   borrador: 'Borrador (sin terminar)',
@@ -24,6 +25,7 @@ export function MisRegistrosPage() {
   const [error, setError] = useState<string | null>(null)
   const [entregando, setEntregando] = useState<string | null>(null)
   const [nombresCampanas, setNombresCampanas] = useState<Record<string, string>>({})
+  const [editando, setEditando] = useState<Registro | null>(null)
 
   async function cargar() {
     if (!user) return
@@ -107,7 +109,16 @@ export function MisRegistrosPage() {
     setEntregando(null)
   }
 
-  return (
+  return editando ? (
+    <EditarRegistroPage
+      registro={editando}
+      onCancelar={() => setEditando(null)}
+      onGuardado={() => {
+        setEditando(null)
+        cargar()
+      }}
+    />
+  ) : (
     <div className="el-main" style={{ paddingBottom: 90 }}>
       <h1 className="el-title">Mis registros</h1>
       <p className="el-subtitle">
@@ -173,9 +184,19 @@ export function MisRegistrosPage() {
                 </p>
               )}
               {r.estado === 'borrador' && (
-                <p className="el-admin-linea" style={{ color: 'var(--magenta)' }}>
-                  Falta completar la ficha de clasificación para que se pueda revisar.
-                </p>
+                <>
+                  <p className="el-admin-linea" style={{ color: 'var(--magenta)' }}>
+                    Falta completar la ficha de clasificación para que se pueda revisar.
+                  </p>
+                  <button
+                    type="button"
+                    className="el-btn el-btn-primary"
+                    style={{ width: 'auto', padding: '8px 16px', fontSize: 14, marginTop: 6 }}
+                    onClick={() => setEditando(r)}
+                  >
+                    Completar y enviar
+                  </button>
+                </>
               )}
             </div>
           </div>

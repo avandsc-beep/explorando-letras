@@ -1,15 +1,25 @@
 import { useState, type FormEvent } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 
+type Modo = 'login' | 'registro' | 'recuperar'
+
 export function LoginPage() {
-  const { iniciarSesionConEmail, registrarseConEmail, iniciarSesionConGoogle } = useAuth()
-  const [modo, setModo] = useState<'login' | 'registro'>('login')
+  const { iniciarSesionConEmail, registrarseConEmail, iniciarSesionConGoogle, recuperarContrasena } = useAuth()
+  const [modo, setModo] = useState<Modo>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmarPassword, setConfirmarPassword] = useState('')
+  const [mostrarPassword, setMostrarPassword] = useState(false)
   const [nombrePublico, setNombrePublico] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [cargando, setCargando] = useState(false)
   const [mensajeOk, setMensajeOk] = useState<string | null>(null)
+
+  function cambiarModo(nuevoModo: Modo) {
+    setModo(nuevoModo)
+    setError(null)
+    setMensajeOk(null)
+  }
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
@@ -17,12 +27,28 @@ export function LoginPage() {
     setMensajeOk(null)
     setCargando(true)
 
+    if (modo === 'recuperar') {
+      const { error } = await recuperarContrasena(email)
+      if (error) {
+        setError(error)
+      } else {
+        setMensajeOk('Listo. Revisá tu correo — te mandamos instrucciones para elegir una contraseña nueva.')
+      }
+      setCargando(false)
+      return
+    }
+
     if (modo === 'login') {
       const { error } = await iniciarSesionConEmail(email, password)
       if (error) setError(error)
     } else {
       if (nombrePublico.trim().length < 2) {
         setError('Ingresá un nombre público (se mostrará en tus aportes).')
+        setCargando(false)
+        return
+      }
+      if (password !== confirmarPassword) {
+        setError('Las dos contraseñas no son iguales. Revisalas y volvé a intentar.')
         setCargando(false)
         return
       }
@@ -55,36 +81,50 @@ export function LoginPage() {
       </div>
 
       <div className="el-card">
-        <h1 className="el-title">{modo === 'login' ? 'Ingresar' : 'Crear cuenta'}</h1>
+        <h1 className="el-title">
+          {modo === 'login' ? 'Ingresar' : modo === 'registro' ? 'Crear cuenta' : 'Recuperar contraseña'}
+        </h1>
         <p className="el-subtitle">
           {modo === 'login'
             ? 'Ingresá con tu cuenta para empezar a registrar letras en el mapa.'
-            : 'Creá tu cuenta gratis para empezar a sumar letras al mapa.'}
+            : modo === 'registro'
+              ? 'Creá tu cuenta gratis para empezar a sumar letras al mapa.'
+              : 'Escribí el email con el que te registraste y te mandamos instrucciones para elegir una contraseña nueva.'}
         </p>
 
         {error && <div className="el-error">{error}</div>}
-        {mensajeOk && <div className="el-error" style={{ borderColor: 'var(--leaf)', color: 'var(--leaf)', background: 'rgba(90,156,74,0.12)' }}>{mensajeOk}</div>}
+        {mensajeOk && (
+          <div
+            className="el-error"
+            style={{ borderColor: 'var(--leaf)', color: 'var(--leaf)', background: 'rgba(90,156,74,0.12)' }}
+          >
+            {mensajeOk}
+          </div>
+        )}
 
-        <button
-          type="button"
-          className="el-btn el-btn-google"
-          onClick={() => iniciarSesionConGoogle()}
-        >
-          <GoogleIcon />
-          Continuar con Google
-        </button>
+        {modo !== 'recuperar' && (
+          <>
+            <button type="button" className="el-btn el-btn-google" onClick={() => iniciarSesionConGoogle()}>
+              <GoogleIcon />
+              Continuar con Google
+            </button>
 
-        <div className="el-divider-text">o con email</div>
+            <div className="el-divider-text">o con email</div>
+          </>
+        )}
 
         <form onSubmit={onSubmit}>
           {modo === 'registro' && (
             <div className="el-field">
               <label className="el-label" htmlFor="nombre">Nombre público</label>
+              <p className="el-hint" style={{ marginTop: -4, marginBottom: 6 }}>
+                El nombre con el que vas a aparecer en tus aportes. Puede ser tu nombre real o un apodo.
+              </p>
               <input
                 id="nombre"
                 className="el-input"
                 type="text"
-                placeholder="Como querés aparecer en tus aportes"
+                placeholder="Ej. María López"
                 value={nombrePublico}
                 onChange={(e) => setNombrePublico(e.target.value)}
               />
@@ -103,29 +143,84 @@ export function LoginPage() {
             />
           </div>
 
-          <div className="el-field">
-            <label className="el-label" htmlFor="password">Contraseña</label>
-            <input
-              id="password"
-              className="el-input"
-              type="password"
-              required
-              minLength={6}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
+          {modo !== 'recuperar' && (
+            <>
+              <div className="el-field">
+                <label className="el-label" htmlFor="password">Contraseña</label>
+                {modo === 'registro' && (
+                  <p className="el-hint" style={{ marginTop: -4, marginBottom: 6 }}>
+                    Tiene que tener al menos 6 caracteres.
+                  </p>
+                )}
+                <input
+                  id="password"
+                  className="el-input"
+                  type={mostrarPassword ? 'text' : 'password'}
+                  required
+                  minLength={6}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+
+              {modo === 'registro' && (
+                <div className="el-field">
+                  <label className="el-label" htmlFor="password2">Repetí la contraseña</label>
+                  <input
+                    id="password2"
+                    className="el-input"
+                    type={mostrarPassword ? 'text' : 'password'}
+                    required
+                    minLength={6}
+                    value={confirmarPassword}
+                    onChange={(e) => setConfirmarPassword(e.target.value)}
+                  />
+                </div>
+              )}
+
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  fontSize: 15,
+                  color: 'var(--paper-dim)',
+                  marginBottom: 16,
+                  cursor: 'pointer',
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={mostrarPassword}
+                  onChange={(e) => setMostrarPassword(e.target.checked)}
+                />
+                Mostrar la contraseña mientras escribo
+              </label>
+            </>
+          )}
 
           <button type="submit" className="el-btn el-btn-primary" disabled={cargando}>
-            {cargando ? 'Un momento…' : modo === 'login' ? 'Ingresar' : 'Crear cuenta'}
+            {cargando
+              ? 'Un momento…'
+              : modo === 'login'
+                ? 'Ingresar'
+                : modo === 'registro'
+                  ? 'Crear cuenta'
+                  : 'Enviar instrucciones'}
           </button>
         </form>
 
+        {modo === 'login' && (
+          <div className="el-link-row">
+            <button onClick={() => cambiarModo('recuperar')}>¿Olvidaste tu contraseña?</button>
+          </div>
+        )}
+
         <div className="el-link-row">
           {modo === 'login' ? (
-            <>¿No tenés cuenta? <button onClick={() => { setModo('registro'); setError(null) }}>Registrate</button></>
+            <>¿No tenés cuenta? <button onClick={() => cambiarModo('registro')}>Registrate</button></>
           ) : (
-            <>¿Ya tenés cuenta? <button onClick={() => { setModo('login'); setError(null) }}>Ingresá</button></>
+            <>¿Ya tenés cuenta? <button onClick={() => cambiarModo('login')}>Ingresá</button></>
           )}
         </div>
       </div>

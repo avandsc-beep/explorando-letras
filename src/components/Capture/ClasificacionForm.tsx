@@ -27,6 +27,7 @@ interface Props {
 export function ClasificacionForm({ valores, onChange }: Props) {
   const [lexicos, setLexicos] = useState<Lexico[]>([])
   const [cargando, setCargando] = useState(true)
+  const [mostrarTecnico, setMostrarTecnico] = useState(false)
 
   useEffect(() => {
     supabase
@@ -129,36 +130,9 @@ export function ClasificacionForm({ valores, onChange }: Props) {
         />
       </fieldset>
 
-      {/* Bloque morfológico */}
+      {/* Texto de la pieza — fácil de responder, siempre visible */}
       <fieldset style={bloqueStyle}>
-        <legend style={legendStyle}>Sobre la forma de las letras</legend>
-        <p className="el-hint" style={{ marginBottom: 10 }}>
-          Estas preguntas son más técnicas. Si no sabés la respuesta, dejalas en blanco sin problema.
-        </p>
-        <SelectLexico
-          etiqueta="¿Las letras tienen serifas?"
-          hint='Las serifas son los pequeños remates en las puntas de las letras (como en "Times New Roman"). Si las letras son simples y sin adornos en las puntas, son "sin serifas".'
-          valor={valores.presencia_serifas}
-          opciones={OPCIONES_SERIFAS}
-          cargando={false}
-          onChange={(v) => set('presencia_serifas', v)}
-        />
-        <SelectLexico
-          etiqueta="¿Qué tan grueso es el trazo?"
-          hint="El grosor de la línea con la que está dibujada la letra."
-          valor={valores.grosor_trazo}
-          opciones={OPCIONES_GROSOR}
-          cargando={false}
-          onChange={(v) => set('grosor_trazo', v)}
-        />
-        <SelectLexico
-          etiqueta="¿Cómo describirías el estilo?"
-          hint="La sensación general que da: geométrica, manuscrita, decorativa, etc."
-          valor={valores.estilo_general}
-          opciones={opciones('estilo_general')}
-          cargando={cargando}
-          onChange={(v) => set('estilo_general', v)}
-        />
+        <legend style={legendStyle}>Qué dice</legend>
         <div className="el-field">
           <label className="el-label">Copiá el texto que dice la letra</label>
           <p className="el-hint" style={{ marginTop: -4, marginBottom: 6 }}>
@@ -171,6 +145,50 @@ export function ClasificacionForm({ valores, onChange }: Props) {
             placeholder="Ej. Panadería La Espiga"
           />
         </div>
+      </fieldset>
+
+      {/* Bloque morfológico — más técnico, oculto por defecto */}
+      <fieldset style={bloqueStyle}>
+        {!mostrarTecnico ? (
+          <button
+            type="button"
+            className="el-btn el-btn-ghost"
+            onClick={() => setMostrarTecnico(true)}
+          >
+            Mostrar preguntas más técnicas (opcional)
+          </button>
+        ) : (
+          <>
+            <legend style={legendStyle}>Sobre la forma de las letras</legend>
+            <p className="el-hint" style={{ marginBottom: 10 }}>
+              Estas preguntas son más técnicas. Si no sabés la respuesta, dejalas en blanco sin problema.
+            </p>
+            <SelectLexico
+              etiqueta="¿Las letras tienen serifas?"
+              hint='Las serifas son los pequeños remates en las puntas de las letras (como en "Times New Roman"). Si las letras son simples y sin adornos en las puntas, son "sin serifas".'
+              valor={valores.presencia_serifas}
+              opciones={OPCIONES_SERIFAS}
+              cargando={false}
+              onChange={(v) => set('presencia_serifas', v)}
+            />
+            <SelectLexico
+              etiqueta="¿Qué tan grueso es el trazo?"
+              hint="El grosor de la línea con la que está dibujada la letra."
+              valor={valores.grosor_trazo}
+              opciones={OPCIONES_GROSOR}
+              cargando={false}
+              onChange={(v) => set('grosor_trazo', v)}
+            />
+            <SelectLexico
+              etiqueta="¿Cómo describirías el estilo?"
+              hint="La sensación general que da: geométrica, manuscrita, decorativa, etc."
+              valor={valores.estilo_general}
+              opciones={opciones('estilo_general')}
+              cargando={cargando}
+              onChange={(v) => set('estilo_general', v)}
+            />
+          </>
+        )}
       </fieldset>
     </div>
   )

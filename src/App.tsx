@@ -37,7 +37,11 @@ function AppContenido() {
     <div className="el-app">
       <header className="el-header">
         <div className="el-brand">
-          Explorando<span>Letras</span>
+          <img
+            src="/assets/logo-explorando-letras.png"
+            alt="Explorando Letras"
+            style={{ height: 28, width: 'auto', display: 'block' }}
+          />
         </div>
         {user ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

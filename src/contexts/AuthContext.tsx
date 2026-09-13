@@ -14,6 +14,7 @@ interface AuthContextValue {
     nombrePublico: string
   ) => Promise<{ error: string | null }>
   iniciarSesionConGoogle: () => Promise<void>
+  recuperarContrasena: (email: string) => Promise<{ error: string | null }>
   cerrarSesion: () => Promise<void>
 }
 
@@ -54,18 +55,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function registrarseConEmail(email: string, password: string, nombrePublico: string) {
-    const { data, error } = await supabase.auth.signUp({ email, password })
+    // Le pasamos el nombre elegido como metadata del usuario: el trigger de la
+    // base de datos (crear_perfil_automatico) lo toma de ahí para crear el
+    // perfil correctamente desde el primer momento, sin un segundo paso que
+    // podría chocar con las reglas de seguridad si el email no fue confirmado.
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: nombrePublico } },
+    })
     if (error) return { error: traducirErrorAuth(error.message) }
-
-    if (data.user) {
-      const { error: errorPerfil } = await supabase.from('perfiles').insert({
-        id: data.user.id,
-        nombre_publico: nombrePublico,
-        rol: 'ciudadano',
-      })
-      if (errorPerfil) return { error: 'No se pudo crear el perfil: ' + errorPerfil.message }
-    }
     return { error: null }
+  }
+
+  async function recuperarContrasena(email: string) {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin,
+    })
+    return { error: error ? traducirErrorAuth(error.message) : null }
   }
 
   async function iniciarSesionConGoogle() {
@@ -89,6 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         iniciarSesionConEmail,
         registrarseConEmail,
         iniciarSesionConGoogle,
+        recuperarContrasena,
         cerrarSesion,
       }}
     >

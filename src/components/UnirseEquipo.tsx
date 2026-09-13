@@ -74,7 +74,10 @@ export function UnirseEquipo() {
       .insert({ equipo_id: equipo.id, usuario_id: user.id })
 
     if (errInsert && !errInsert.message.includes('duplicate')) {
-      setMensaje({ tipo: 'error', texto: 'No se pudo unir al equipo: ' + errInsert.message })
+      const mensajeAmigable = errInsert.message.includes('foreign key')
+        ? 'Tu cuenta todavía no está completamente lista. Cerrá sesión, volvé a entrar, y probá de nuevo.'
+        : 'No se pudo unir al equipo. Probá de nuevo en un momento.'
+      setMensaje({ tipo: 'error', texto: mensajeAmigable })
       setUniendo(false)
       return
     }

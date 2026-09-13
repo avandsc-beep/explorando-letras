@@ -2,11 +2,68 @@ import { useState } from 'react'
 import { MapaPage } from './MapaPage'
 import { GaleriaPage } from './GaleriaPage'
 
+const CLAVE_INTRO_VISTA = 'el_intro_vista'
+
 export function ExplorarPage() {
   const [vista, setVista] = useState<'mapa' | 'galeria'>('mapa')
+  const [mostrarIntro, setMostrarIntro] = useState(
+    () => typeof window !== 'undefined' && localStorage.getItem(CLAVE_INTRO_VISTA) !== 'true',
+  )
+
+  function cerrarIntro() {
+    setMostrarIntro(false)
+    try {
+      localStorage.setItem(CLAVE_INTRO_VISTA, 'true')
+    } catch {
+      // si el navegador bloquea localStorage, no pasa nada grave
+    }
+  }
 
   return (
     <>
+      {mostrarIntro && (
+        <div
+          className="el-card"
+          style={{
+            margin: '12px 16px 0',
+            background: 'rgba(230, 56, 136, 0.08)',
+            border: '1px solid rgba(230, 56, 136, 0.3)',
+          }}
+        >
+          <p style={{ margin: '0 0 10px', fontSize: 17, fontWeight: 700 }}>¿Qué es Explorando Letras?</p>
+          <p style={{ margin: '0 0 14px', fontSize: 16, lineHeight: 1.6 }}>
+            Es un proyecto para guardar la memoria de las letras hechas a mano que hay en la ciudad:
+            carteles antiguos, nombres de negocios pintados a mano, avisos escritos en las paredes. Con el
+            tiempo se van perdiendo, así que las estamos fotografiando y guardando en un archivo antes de
+            que desaparezcan.
+          </p>
+          <p style={{ margin: '0 0 6px', fontSize: 16, fontWeight: 700 }}>¿Qué podés hacer acá?</p>
+          <p style={{ margin: '0 0 4px', fontSize: 16, lineHeight: 1.6 }}>
+            1. Mirar todo lo que ya se registró, en el mapa o en la galería de fotos.
+          </p>
+          <p style={{ margin: '0 0 4px', fontSize: 16, lineHeight: 1.6 }}>
+            2. Si querés, podés sumar tus propias fotos. Para eso hace falta crear una cuenta gratis —
+            tocá "Registrar" abajo cuando quieras empezar.
+          </p>
+          <button type="button" className="el-btn el-btn-ghost" style={{ marginTop: 12 }} onClick={cerrarIntro}>
+            Entendido, no mostrar de nuevo
+          </button>
+        </div>
+      )}
+
+      {!mostrarIntro && (
+        <div style={{ margin: '10px 16px 0', textAlign: 'center' }}>
+          <button
+            type="button"
+            className="el-btn el-btn-ghost"
+            style={{ width: 'auto', padding: '6px 14px', fontSize: 13 }}
+            onClick={() => setMostrarIntro(true)}
+          >
+            ¿Qué es esta página?
+          </button>
+        </div>
+      )}
+
       <div className="el-admin-tabs" style={{ margin: '12px 16px 0' }}>
         <button
           type="button"

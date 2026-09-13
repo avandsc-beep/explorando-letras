@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase'
 import { PhotoCapture } from '../components/Capture/PhotoCapture'
 import { GeoCapture, type Ubicacion } from '../components/Capture/GeoCapture'
 import { ClasificacionForm, type DatosClasificacion } from '../components/Capture/ClasificacionForm'
+import { IndicadorPasos } from '../components/Capture/IndicadorPasos'
 
 type Paso = 'modo' | 'foto' | 'ubicacion' | 'clasificacion' | 'guardado'
 
@@ -195,6 +196,18 @@ export function CapturePage({ onGuardado }: Props) {
 
         {error && <div className="el-error">{error}</div>}
 
+        {paso !== 'guardado' && (
+          <IndicadorPasos
+            pasoActual={{ modo: 1, foto: 2, ubicacion: 3, clasificacion: 4 }[paso]}
+            totalPasos={4}
+            etiqueta={
+              { modo: 'Elegí el modo', foto: 'Sacá la foto', ubicacion: 'Confirmá la ubicación', clasificacion: 'Completá los datos' }[
+                paso
+              ]
+            }
+          />
+        )}
+
         {paso === 'modo' && (
           <>
             {cargandoOpciones ? (
@@ -264,6 +277,14 @@ export function CapturePage({ onGuardado }: Props) {
               que puedas, sin gente ni autos tapándola.
             </p>
             <PhotoCapture onFotoLista={onFotoLista} />
+            <button
+              type="button"
+              className="el-btn el-btn-ghost"
+              style={{ marginTop: 12 }}
+              onClick={() => setPaso('modo')}
+            >
+              Volver
+            </button>
           </>
         )}
 
@@ -281,6 +302,14 @@ export function CapturePage({ onGuardado }: Props) {
               ubicación automáticamente — dale permiso si te lo pide.
             </p>
             <GeoCapture onUbicacionLista={onUbicacionLista} />
+            <button
+              type="button"
+              className="el-btn el-btn-ghost"
+              style={{ marginTop: 12 }}
+              onClick={() => setPaso('foto')}
+            >
+              Volver a la foto
+            </button>
           </>
         )}
 
@@ -298,7 +327,15 @@ export function CapturePage({ onGuardado }: Props) {
               todas las respuestas — completá lo que puedas.
             </p>
             <ClasificacionForm valores={clasificacion} onChange={setClasificacion} />
-            <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+            <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                className="el-btn el-btn-ghost"
+                disabled={guardando}
+                onClick={() => setPaso('ubicacion')}
+              >
+                Volver
+              </button>
               <button
                 type="button"
                 className="el-btn el-btn-ghost"

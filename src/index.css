@@ -1,15 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-  /* Paleta simplificada: magenta como único acento, blanco como texto principal */
-  --ink: #15130f;         /* fondo oscuro */
-  --ink-soft: #201d18;    /* superficie de tarjeta */
-  --ink-line: #3a352e;    /* líneas divisorias, bordes */
+  /* Paleta de marca: naranja + morado (extraídos de la identidad real del logo) */
+  --ink: #2e0f08;         /* fondo oscuro, con tinte cálido hacia el naranja */
+  --ink-soft: #3f160b;    /* superficie de tarjeta */
+  --ink-line: #6b2a16;    /* líneas divisorias, bordes */
   --paper: #ffffff;       /* texto principal: blanco */
-  --paper-dim: #c9c2b4;   /* texto secundario */
-  --magenta: #e63888;     /* único color de acento: botones, links, títulos */
-  --brick: #c0392b;       /* rojo: solo para errores */
-  --leaf: #4a9d4a;        /* verde: solo para confirmaciones */
+  --paper-dim: #e8c7b8;   /* texto secundario, tinte cálido */
+  --magenta: #a6179a;     /* morado de marca (aclarado para legibilidad): botones, links, títulos */
+  --naranja: #dc3512;     /* naranja de marca: cabecera y barra de navegación */
+  --brick: #d6402a;       /* rojo: solo para errores */
+  --leaf: #3fa34d;        /* verde: solo para confirmaciones */
 
   --font-display: 'Space Grotesk', system-ui, sans-serif;
   --font-sans: 'Space Grotesk', system-ui, sans-serif;
@@ -62,10 +63,10 @@ textarea {
   align-items: center;
   justify-content: space-between;
   padding: 14px 20px;
-  border-bottom: 1px solid var(--ink-line);
+  border-bottom: none;
   position: sticky;
   top: 0;
-  background: var(--ink);
+  background: var(--naranja);
   z-index: 10;
 }
 
@@ -170,7 +171,7 @@ textarea {
 
 .el-btn-primary {
   background: var(--magenta);
-  color: var(--ink);
+  color: #ffffff;
 }
 
 .el-btn-google {
@@ -298,8 +299,8 @@ textarea {
   left: 0;
   right: 0;
   display: flex;
-  background: var(--ink-soft);
-  border-top: 1px solid var(--ink-line);
+  background: var(--naranja);
+  border-top: none;
   z-index: 20;
 }
 
@@ -307,10 +308,10 @@ textarea {
   flex: 1;
   background: none;
   border: none;
-  color: var(--paper-dim);
-  padding: 10px 0 12px;
+  color: rgba(255, 255, 255, 0.72);
+  padding: 12px 0 14px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   font-family: var(--font-sans);
   cursor: pointer;
   display: flex;
@@ -324,7 +325,20 @@ textarea {
 }
 
 .el-tab-activo {
-  color: var(--magenta);
+  color: #ffffff;
+  position: relative;
+}
+
+.el-tab-activo::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 3px;
+  border-radius: 2px;
+  background: #ffffff;
 }
 
 /* ---- Mapa público ---- */
