@@ -3,6 +3,7 @@ import { supabase, type Registro, type Lexico } from '../lib/supabase'
 
 interface Filtros {
   ciudad: string
+  campana: string
   tecnica: string
   soporte: string
   funcion: string
@@ -10,7 +11,7 @@ interface Filtros {
 
 type Agrupacion = 'ninguna' | 'ciudad' | 'fecha' | 'tecnica' | 'soporte' | 'funcion' | 'campana'
 
-const FILTROS_VACIOS: Filtros = { ciudad: '', tecnica: '', soporte: '', funcion: '' }
+const FILTROS_VACIOS: Filtros = { ciudad: '', campana: '', tecnica: '', soporte: '', funcion: '' }
 
 interface RegistroConDatos extends Registro {
   autor_nombre?: string
@@ -21,6 +22,7 @@ export function GaleriaPage({ onRegistrar }: { onRegistrar: () => void }) {
   const [registros, setRegistros] = useState<RegistroConDatos[]>([])
   const [lexicos, setLexicos] = useState<Lexico[]>([])
   const [ciudadesDisponibles, setCiudadesDisponibles] = useState<string[]>([])
+  const [campanas, setCampanas] = useState<{ id: string; nombre: string }[]>([])
   const [filtros, setFiltros] = useState<Filtros>(FILTROS_VACIOS)
   const [agrupacion, setAgrupacion] = useState<Agrupacion>('ninguna')
   const [cargando, setCargando] = useState(true)
@@ -42,6 +44,12 @@ export function GaleriaPage({ onRegistrar }: { onRegistrar: () => void }) {
         const unicas = [...new Set((data as { ciudad: string }[] ?? []).map((r) => r.ciudad))]
         setCiudadesDisponibles(unicas)
       })
+
+    supabase
+      .from('campanas')
+      .select('id, nombre')
+      .order('nombre')
+      .then(({ data }) => setCampanas((data as { id: string; nombre: string }[]) ?? []))
   }, [])
 
   useEffect(() => {
@@ -55,6 +63,7 @@ export function GaleriaPage({ onRegistrar }: { onRegistrar: () => void }) {
 
     let query = supabase.from('registros').select('*').eq('estado', 'validada')
     if (filtros.ciudad) query = query.eq('ciudad', filtros.ciudad)
+    if (filtros.campana) query = query.eq('campana_id', filtros.campana)
     if (filtros.tecnica) query = query.eq('tecnica', filtros.tecnica)
     if (filtros.soporte) query = query.eq('soporte', filtros.soporte)
     if (filtros.funcion) query = query.eq('funcion', filtros.funcion)
@@ -147,16 +156,36 @@ export function GaleriaPage({ onRegistrar }: { onRegistrar: () => void }) {
         foto para ver todos sus datos.
       </p>
 
+      <div style={{ display: 'flex', gap: 8, overflowX: 'auto', marginBottom: 14, paddingBottom: 4 }}>
+        <button
+          type="button"
+          onClick={() => setFiltros({ ...filtros, ciudad: '' })}
+          className={`el-chip ${!filtros.ciudad ? 'el-chip-activa' : ''}`}
+        >
+          Todas
+        </button>
+        {ciudadesDisponibles.map((c) => (
+          <button
+            key={c}
+            type="button"
+            onClick={() => setFiltros({ ...filtros, ciudad: c })}
+            className={`el-chip ${filtros.ciudad === c ? 'el-chip-activa' : ''}`}
+          >
+            {c}
+          </button>
+        ))}
+      </div>
+
       <div className="el-mapa-filtros" style={{ padding: 0, marginBottom: 12, background: 'none', border: 'none' }}>
         <select
           className="el-select el-select-compacto"
-          value={filtros.ciudad}
-          onChange={(e) => setFiltros({ ...filtros, ciudad: e.target.value })}
+          value={filtros.campana}
+          onChange={(e) => setFiltros({ ...filtros, campana: e.target.value })}
         >
-          <option value="">Todas las ciudades</option>
-          {ciudadesDisponibles.map((c) => (
-            <option key={c} value={c}>
-              {c}
+          <option value="">Todas las campañas</option>
+          {campanas.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.nombre}
             </option>
           ))}
         </select>
@@ -259,20 +288,10 @@ export function GaleriaPage({ onRegistrar }: { onRegistrar: () => void }) {
       )}
 
       {piezaSeleccionada && (
-        <div className="el-modal-overlay" onClick={() => setPiezaSeleccionada(null)}>
-          <div className="el-modal" onClick={(e) => e.stopPropagation()}>
-            <div style={{ padding: '12px 18px 0', textAlign: 'right' }}>
-              <button
-                type="button"
-                className="el-btn el-btn-ghost"
-                style={{ width: 'auto', padding: '6px 14px', fontSize: 14 }}
-                onClick={() => setPiezaSeleccionada(null)}
-              >
-                Cerrar
-              </button>
-            </div>
+        <div className="el-sheet-overlay" onClick={() => setPiezaSeleccionada(null)}>
+          <div className="el-sheet" onClick={(e) => e.stopPropagation()}>
             {piezaSeleccionada.foto_url && (
-              <img src={piezaSeleccionada.foto_url} alt="" className="el-modal-foto" />
+              <img src={piezaSeleccionada.foto_url} alt="" className="el-sheet-foto" />
             )}
             <div style={{ padding: 18 }}>
               <p style={{ fontWeight: 700, fontSize: 18, margin: '0 0 4px' }}>

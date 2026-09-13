@@ -18,7 +18,7 @@ interface GrupoPendienteEntrega {
   registros: Registro[]
 }
 
-export function MisRegistrosPage() {
+export function MisRegistrosPage({ onIrACuenta }: { onIrACuenta?: () => void }) {
   const { user } = useAuth()
   const [registros, setRegistros] = useState<Registro[]>([])
   const [cargando, setCargando] = useState(true)
@@ -109,6 +109,22 @@ export function MisRegistrosPage() {
     setEntregando(null)
   }
 
+  if (!user) {
+    return (
+      <div className="el-main">
+        <div className="el-card" style={{ textAlign: 'center', marginTop: 40 }}>
+          <p style={{ margin: '0 0 6px', fontSize: 17, fontWeight: 700 }}>Ingresá para ver tus registros</p>
+          <p className="el-hint" style={{ margin: '0 0 18px' }}>
+            Ahí vas a ver todo lo que registraste y en qué estado está.
+          </p>
+          <button type="button" className="el-btn el-btn-primary" onClick={onIrACuenta}>
+            Ingresar / Crear cuenta
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return editando ? (
     <EditarRegistroPage
       registro={editando}
@@ -185,7 +201,7 @@ export function MisRegistrosPage() {
               )}
               {r.estado === 'borrador' && (
                 <>
-                  <p className="el-admin-linea" style={{ color: 'var(--magenta)' }}>
+                  <p className="el-admin-linea" style={{ color: 'var(--paper)', fontWeight: 700 }}>
                     Falta completar la ficha de clasificación para que se pueda revisar.
                   </p>
                   <button

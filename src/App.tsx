@@ -1,20 +1,34 @@
 import { useState } from 'react'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
-import { LoginPage } from './components/Auth/LoginPage'
 import { CapturePage } from './pages/CapturePage'
 import { ExplorarPage } from './pages/ExplorarPage'
 import { AdminPage } from './pages/AdminPage'
 import { MisRegistrosPage } from './pages/MisRegistrosPage'
+import { CuentaPage } from './pages/CuentaPage'
+import { OnboardingCarousel, onboardingYaVisto } from './components/OnboardingCarousel'
+import { IconExplorar, IconRegistrar, IconMisRegistros, IconCuenta, IconCuentaGrande } from './components/Icons'
 
-type Vista = 'mapa' | 'registrar' | 'mis-registros' | 'admin'
+type Vista = 'explorar' | 'registrar' | 'mis-registros' | 'cuenta' | 'admin'
+
+function TarjetaNecesitaCuenta({ titulo, texto, onIr }: { titulo: string; texto: string; onIr: () => void }) {
+  return (
+    <div className="el-main">
+      <div className="el-card" style={{ textAlign: 'center', marginTop: 40 }}>
+        <IconCuentaGrande />
+        <p style={{ margin: '12px 0 6px', fontSize: 17, fontWeight: 700 }}>{titulo}</p>
+        <p style={{ margin: '0 0 18px', fontSize: 14, color: 'var(--paper-dim)', lineHeight: 1.5 }}>{texto}</p>
+        <button type="button" className="el-btn el-btn-primary" onClick={onIr}>
+          Ingresar / Crear cuenta
+        </button>
+      </div>
+    </div>
+  )
+}
 
 function AppContenido() {
-  const { user, perfil, cargando, cerrarSesion } = useAuth()
-  const [vista, setVista] = useState<Vista>('mapa')
-  const [menuAbierto, setMenuAbierto] = useState(false)
-  const [mostrarInfoProyecto, setMostrarInfoProyecto] = useState(false)
-
-  const esAdmin = perfil?.rol === 'admin' || perfil?.rol === 'moderador'
+  const { user, cargando } = useAuth()
+  const [vista, setVista] = useState<Vista>('explorar')
+  const [mostrarOnboarding, setMostrarOnboarding] = useState(() => !onboardingYaVisto())
 
   if (cargando) {
     return (
@@ -24,124 +38,103 @@ function AppContenido() {
     )
   }
 
-  function irA(v: Vista) {
-    setVista(v)
-    setMenuAbierto(false)
+  if (mostrarOnboarding) {
+    return (
+      <div className="el-app">
+        <OnboardingCarousel
+          onExplorar={() => {
+            setMostrarOnboarding(false)
+            setVista('explorar')
+          }}
+          onRegistrar={() => {
+            setMostrarOnboarding(false)
+            setVista('registrar')
+          }}
+        />
+      </div>
+    )
   }
 
-  // El mapa es público: cualquier persona puede verlo sin necesidad de una cuenta.
-  // Registrar, ver "Mis registros" y administrar sí requieren haber ingresado.
   function contenidoPrincipal() {
-    if (vista === 'mapa') return <ExplorarPage onRegistrar={() => irA('registrar')} />
-    if (!user) return <LoginPage />
-    if (vista === 'registrar') return <CapturePage onGuardado={() => setVista('mis-registros')} />
-    if (vista === 'mis-registros') return <MisRegistrosPage />
-    if (vista === 'admin' && esAdmin) return <AdminPage />
-    return <ExplorarPage onRegistrar={() => irA('registrar')} />
+    if (vista === 'explorar') return <ExplorarPage onRegistrar={() => setVista('registrar')} />
+
+    if (vista === 'registrar') {
+      if (!user) {
+        return (
+          <TarjetaNecesitaCuenta
+            titulo="Necesitás una cuenta gratis"
+            texto="Es rápido y gratis — así tus fotos quedan asociadas a tu nombre en el archivo."
+            onIr={() => setVista('cuenta')}
+          />
+        )
+      }
+      return <CapturePage onGuardado={() => setVista('mis-registros')} />
+    }
+
+    if (vista === 'mis-registros') {
+      if (!user) {
+        return (
+          <TarjetaNecesitaCuenta
+            titulo="Ingresá para ver tus registros"
+            texto="Ahí vas a ver todo lo que registraste y en qué estado está."
+            onIr={() => setVista('cuenta')}
+          />
+        )
+      }
+      return <MisRegistrosPage />
+    }
+
+    if (vista === 'admin') return <AdminPage />
+
+    return <CuentaPage onAdministrar={() => setVista('admin')} />
   }
 
   return (
     <div className="el-app">
       <header className="el-header">
-        <button type="button" className="el-brand" onClick={() => irA('mapa')} style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}>
-          <img
-            src="/assets/logo-explorando-letras-full.png"
-            alt="Explorando Letras"
-            style={{ height: 40, width: 'auto', display: 'block' }}
-          />
-        </button>
-
-        <button
-          type="button"
-          className="el-btn-menu"
-          onClick={() => setMenuAbierto((v) => !v)}
-          aria-expanded={menuAbierto}
-        >
-          Menú
-        </button>
+        <img
+          src="/assets/logo-explorando-letras-full.png"
+          alt="Explorando Letras"
+          style={{ height: 28, width: 'auto', display: 'block' }}
+        />
       </header>
-
-      {menuAbierto && (
-        <>
-          <div className="el-menu-overlay" onClick={() => setMenuAbierto(false)} />
-          <nav className="el-menu-panel">
-            <button type="button" className={`el-menu-item ${vista === 'mapa' ? 'el-menu-item-activo' : ''}`} onClick={() => irA('mapa')}>
-              Explorar
-            </button>
-            <button type="button" className={`el-menu-item ${vista === 'registrar' ? 'el-menu-item-activo' : ''}`} onClick={() => irA('registrar')}>
-              Registrar
-            </button>
-            <button type="button" className={`el-menu-item ${vista === 'mis-registros' ? 'el-menu-item-activo' : ''}`} onClick={() => irA('mis-registros')}>
-              Mis registros
-            </button>
-            {user && esAdmin && (
-              <button type="button" className={`el-menu-item ${vista === 'admin' ? 'el-menu-item-activo' : ''}`} onClick={() => irA('admin')}>
-                Administrar
-              </button>
-            )}
-            <div className="el-menu-divisor" />
-            <button
-              type="button"
-              className="el-menu-item"
-              onClick={() => {
-                setMostrarInfoProyecto(true)
-                setMenuAbierto(false)
-              }}
-            >
-              ¿Qué es este proyecto?
-            </button>
-            <div className="el-menu-divisor" />
-            {user ? (
-              <>
-                <p className="el-menu-usuario">Conectado como {perfil?.nombre_publico}</p>
-                <button
-                  type="button"
-                  className="el-menu-item"
-                  onClick={() => {
-                    cerrarSesion()
-                    setMenuAbierto(false)
-                  }}
-                >
-                  Cerrar sesión
-                </button>
-              </>
-            ) : (
-              <button type="button" className="el-menu-item" onClick={() => irA('registrar')}>
-                Ingresar / Crear cuenta
-              </button>
-            )}
-          </nav>
-        </>
-      )}
 
       <div className="el-vista-contenido">{contenidoPrincipal()}</div>
 
-      {mostrarInfoProyecto && (
-        <div className="el-modal-overlay" onClick={() => setMostrarInfoProyecto(false)}>
-          <div className="el-modal" onClick={(e) => e.stopPropagation()}>
-            <div style={{ padding: 20 }}>
-              <p style={{ margin: '0 0 10px', fontSize: 18, fontWeight: 700 }}>¿Qué es Explorando Letras?</p>
-              <p style={{ margin: '0 0 14px', fontSize: 16, lineHeight: 1.6 }}>
-                Es un proyecto para guardar la memoria de las letras hechas a mano que hay en la ciudad:
-                carteles antiguos, nombres de negocios pintados a mano, avisos escritos en las paredes. Con
-                el tiempo se van perdiendo, así que las estamos fotografiando y guardando en un archivo
-                antes de que desaparezcan.
-              </p>
-              <p style={{ margin: '0 0 6px', fontSize: 16, fontWeight: 700 }}>¿Qué podés hacer acá?</p>
-              <p style={{ margin: '0 0 4px', fontSize: 16, lineHeight: 1.6 }}>
-                1. Mirar todo lo que ya se registró, en el mapa o en la galería de fotos.
-              </p>
-              <p style={{ margin: '0 0 14px', fontSize: 16, lineHeight: 1.6 }}>
-                2. Si querés, podés sumar tus propias fotos — hace falta crear una cuenta gratis, desde
-                "Registrar" en el menú.
-              </p>
-              <button type="button" className="el-btn el-btn-ghost" onClick={() => setMostrarInfoProyecto(false)}>
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <nav className="el-tabbar-iconos">
+        <button
+          type="button"
+          className={`el-tab-icono-btn ${vista === 'explorar' ? 'el-tab-icono-activo' : ''}`}
+          onClick={() => setVista('explorar')}
+        >
+          <IconExplorar />
+          <span>Explorar</span>
+        </button>
+        <button
+          type="button"
+          className={`el-tab-icono-btn ${vista === 'registrar' ? 'el-tab-icono-activo' : ''}`}
+          onClick={() => setVista('registrar')}
+        >
+          <IconRegistrar />
+          <span>Registrar</span>
+        </button>
+        <button
+          type="button"
+          className={`el-tab-icono-btn ${vista === 'mis-registros' ? 'el-tab-icono-activo' : ''}`}
+          onClick={() => setVista('mis-registros')}
+        >
+          <IconMisRegistros />
+          <span>Mis registros</span>
+        </button>
+        <button
+          type="button"
+          className={`el-tab-icono-btn ${vista === 'cuenta' || vista === 'admin' ? 'el-tab-icono-activo' : ''}`}
+          onClick={() => setVista('cuenta')}
+        >
+          <IconCuenta />
+          <span>Cuenta</span>
+        </button>
+      </nav>
     </div>
   )
 }

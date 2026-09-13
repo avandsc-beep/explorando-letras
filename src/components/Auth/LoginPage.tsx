@@ -63,23 +63,7 @@ export function LoginPage() {
   }
 
   return (
-    <div className="el-main">
-      <div
-        className="el-card"
-        style={{
-          marginBottom: 16,
-          background: 'rgba(149, 27, 129, 0.10)',
-          border: '1px solid rgba(149, 27, 129, 0.35)',
-        }}
-      >
-        <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6 }}>
-          <strong>¿Qué es Explorando Letras?</strong> Es un proyecto para guardar la memoria de las
-          letras hechas a mano que hay en la ciudad — carteles, nombres de negocios pintados, avisos
-          escritos a mano. Cualquier persona puede sacarles una foto, anotar dónde están, y sumarlas a un
-          mapa colectivo antes de que se pierdan.
-        </p>
-      </div>
-
+    <>
       <div className="el-card">
         <h1 className="el-title">
           {modo === 'login' ? 'Ingresar' : modo === 'registro' ? 'Crear cuenta' : 'Recuperar contraseña'}
@@ -224,7 +208,7 @@ export function LoginPage() {
           )}
         </div>
       </div>
-    </div>
+    </>
   )
 }
 

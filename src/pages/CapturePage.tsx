@@ -10,6 +10,7 @@ type Paso = 'modo' | 'foto' | 'ubicacion' | 'clasificacion' | 'guardado'
 
 interface Props {
   onGuardado?: () => void
+  onIrACuenta?: () => void
 }
 
 interface OpcionInvestigacion {
@@ -35,7 +36,7 @@ const CLASIFICACION_VACIA: DatosClasificacion = {
   texto_principal: '',
 }
 
-export function CapturePage({ onGuardado }: Props) {
+export function CapturePage({ onGuardado, onIrACuenta }: Props) {
   const { user } = useAuth()
   const [paso, setPaso] = useState<Paso>('modo')
   const [fotoBlob, setFotoBlob] = useState<Blob | null>(null)
@@ -190,6 +191,22 @@ export function CapturePage({ onGuardado }: Props) {
 
   return (
     <div className="el-main">
+      {!user && (
+        <div className="el-card" style={{ textAlign: 'center' }}>
+          <p style={{ margin: '0 0 6px', fontSize: 17, fontWeight: 700 }}>Necesitás una cuenta gratis</p>
+          <p className="el-hint" style={{ margin: '0 0 18px' }}>
+            Es rápido y gratis — así tus fotos quedan asociadas a tu nombre en el archivo.
+          </p>
+          <button type="button" className="el-btn el-btn-primary" style={{ marginBottom: 10 }} onClick={onIrACuenta}>
+            Crear cuenta
+          </button>
+          <button type="button" className="el-btn el-btn-ghost" onClick={onIrACuenta}>
+            Ya tengo cuenta
+          </button>
+        </div>
+      )}
+
+      {user && (
       <div className="el-card">
         <h1 className="el-title">Nuevo registro</h1>
         <p className="el-subtitle">Documentá una pieza de letragrafía en el espacio urbano.</p>
@@ -401,6 +418,7 @@ export function CapturePage({ onGuardado }: Props) {
           </div>
         )}
       </div>
+      )}
     </div>
   )
 }

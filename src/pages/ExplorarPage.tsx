@@ -47,7 +47,7 @@ export function ExplorarPage({ onRegistrar }: Props) {
           </p>
           <p style={{ margin: '0 0 4px', fontSize: 16, lineHeight: 1.6 }}>
             2. Si querés, podés sumar tus propias fotos. Para eso hace falta crear una cuenta gratis —
-            tocá "Registrar" en el menú cuando quieras empezar.
+            tocá "Registrar" abajo cuando quieras empezar.
           </p>
           <button type="button" className="el-btn el-btn-ghost" style={{ marginTop: 12 }} onClick={cerrarIntro}>
             Entendido, no mostrar de nuevo
