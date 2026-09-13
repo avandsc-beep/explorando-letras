@@ -25,8 +25,8 @@ export function CuentaPage({ onAdministrar }: { onAdministrar: () => void }) {
           className="el-card"
           style={{
             marginBottom: 16,
-            background: 'rgba(149, 27, 129, 0.10)',
-            border: '1px solid rgba(149, 27, 129, 0.35)',
+            background: 'rgba(249, 178, 51, 0.10)',
+            border: '1px solid rgba(249, 178, 51, 0.35)',
           }}
         >
           <p style={{ margin: 0, fontSize: 15, lineHeight: 1.6 }}>
@@ -55,7 +55,7 @@ export function CuentaPage({ onAdministrar }: { onAdministrar: () => void }) {
             margin: '0 auto 14px',
             fontSize: 24,
             fontWeight: 700,
-            color: '#fff',
+            color: 'var(--ink)',
           }}
         >
           {inicial}

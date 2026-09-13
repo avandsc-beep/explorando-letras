@@ -13,14 +13,14 @@ export function IndicadorPasos({ pasoActual, totalPasos, etiqueta }: Props) {
             width: 40,
             height: 40,
             borderRadius: '50%',
-            border: '2px solid var(--magenta)',
+            background: 'var(--magenta)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             fontFamily: 'var(--font-display)',
             fontWeight: 700,
             fontSize: 18,
-            color: 'var(--magenta)',
+            color: 'var(--ink)',
             flexShrink: 0,
           }}
         >

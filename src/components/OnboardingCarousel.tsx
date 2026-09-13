@@ -126,10 +126,10 @@ export function OnboardingCarousel({ onExplorar, onRegistrar }: Props) {
           <button
             type="button"
             onClick={() => terminar(onRegistrar)}
-            style={{ textAlign: 'left', background: 'var(--magenta)', border: 'none', borderRadius: 12, padding: '16px 18px', cursor: 'pointer', color: '#fff' }}
+            style={{ textAlign: 'left', background: 'var(--magenta)', border: 'none', borderRadius: 12, padding: '16px 18px', cursor: 'pointer', color: 'var(--ink)' }}
           >
             <span style={{ display: 'block', fontWeight: 700, fontSize: 16, marginBottom: 3 }}>Quiero sumar fotos</span>
-            <span style={{ display: 'block', fontSize: 13, color: 'rgba(255,255,255,0.8)' }}>Creá tu cuenta gratis y empezá a registrar</span>
+            <span style={{ display: 'block', fontSize: 13, color: 'rgba(60,60,59,0.75)' }}>Creá tu cuenta gratis y empezá a registrar</span>
           </button>
         </div>
       )}
@@ -157,7 +157,7 @@ export function OnboardingCarousel({ onExplorar, onRegistrar }: Props) {
         <button
           type="button"
           onClick={() => setPaso((p) => Math.min(2, p + 1))}
-          style={{ width: '100%', border: 'none', borderRadius: 10, padding: 15, fontSize: 16, fontWeight: 700, background: 'var(--magenta)', color: '#fff', cursor: 'pointer' }}
+          style={{ width: '100%', border: 'none', borderRadius: 10, padding: 15, fontSize: 16, fontWeight: 700, background: 'var(--magenta)', color: 'var(--ink)', cursor: 'pointer' }}
         >
           Siguiente
         </button>

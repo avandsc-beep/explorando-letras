@@ -8,7 +8,7 @@ interface MiEquipo {
   nombre_campana: string
 }
 
-export function UnirseEquipo() {
+export function UnirseEquipo({ onUnido }: { onUnido?: () => void } = {}) {
   const { user } = useAuth()
   const [codigo, setCodigo] = useState('')
   const [uniendo, setUniendo] = useState(false)
@@ -83,6 +83,7 @@ export function UnirseEquipo() {
     }
 
     setMensaje({ tipo: 'ok', texto: `Te uniste a "${equipo.nombre}".` })
+    onUnido?.()
     setCodigo('')
     setMostrarForm(false)
     await cargarMisEquipos()

@@ -9,7 +9,7 @@ interface Props {
 }
 
 export function ExplorarPage({ onRegistrar }: Props) {
-  const [vista, setVista] = useState<'mapa' | 'galeria'>('mapa')
+  const [vista, setVista] = useState<'mapa' | 'galeria'>('galeria')
   const [mostrarIntro, setMostrarIntro] = useState(
     () => typeof window !== 'undefined' && localStorage.getItem(CLAVE_INTRO_VISTA) !== 'true',
   )
@@ -30,8 +30,8 @@ export function ExplorarPage({ onRegistrar }: Props) {
           className="el-card"
           style={{
             margin: '12px 16px 0',
-            background: 'rgba(149, 27, 129, 0.10)',
-            border: '1px solid rgba(149, 27, 129, 0.35)',
+            background: 'rgba(249, 178, 51, 0.10)',
+            border: '1px solid rgba(249, 178, 51, 0.35)',
           }}
         >
           <p style={{ margin: '0 0 10px', fontSize: 17, fontWeight: 700 }}>¿Qué es Explorando Letras?</p>
@@ -43,7 +43,7 @@ export function ExplorarPage({ onRegistrar }: Props) {
           </p>
           <p style={{ margin: '0 0 6px', fontSize: 16, fontWeight: 700 }}>¿Qué podés hacer acá?</p>
           <p style={{ margin: '0 0 4px', fontSize: 16, lineHeight: 1.6 }}>
-            1. Mirar todo lo que ya se registró, en el mapa o en la galería de fotos.
+            1. Mirar todo lo que ya se registró, en la galería de fotos o en el mapa.
           </p>
           <p style={{ margin: '0 0 4px', fontSize: 16, lineHeight: 1.6 }}>
             2. Si querés, podés sumar tus propias fotos. Para eso hace falta crear una cuenta gratis —
@@ -71,17 +71,17 @@ export function ExplorarPage({ onRegistrar }: Props) {
       <div className="el-admin-tabs" style={{ margin: '12px 16px 0' }}>
         <button
           type="button"
-          className={`el-admin-tab ${vista === 'mapa' ? 'el-admin-tab-activo' : ''}`}
-          onClick={() => setVista('mapa')}
-        >
-          Ver en el mapa
-        </button>
-        <button
-          type="button"
           className={`el-admin-tab ${vista === 'galeria' ? 'el-admin-tab-activo' : ''}`}
           onClick={() => setVista('galeria')}
         >
           Ver en galería
+        </button>
+        <button
+          type="button"
+          className={`el-admin-tab ${vista === 'mapa' ? 'el-admin-tab-activo' : ''}`}
+          onClick={() => setVista('mapa')}
+        >
+          Ver en el mapa
         </button>
       </div>
 

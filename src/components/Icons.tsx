@@ -68,7 +68,7 @@ export function IconArchivo({ size = 26, color = '#fff' }: IconProps & { color?:
   )
 }
 
-export function IconCuentaGrande({ size = 34, color = '#951b81' }: IconProps & { color?: string }) {
+export function IconCuentaGrande({ size = 34, color = '#f9b233' }: IconProps & { color?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <circle cx="12" cy="8" r="4" stroke={color} strokeWidth="1.6" />

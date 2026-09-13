@@ -7,7 +7,7 @@
   --ink-line: #5c5c5a;    /* líneas divisorias, bordes */
   --paper: #ffffff;       /* texto principal: blanco */
   --paper-dim: #c7c7c5;   /* texto secundario, gris neutro */
-  --magenta: #951b81;     /* morado de marca (del logo real): botones, links, títulos */
+  --magenta: #f9b233;     /* dorado de marca (reemplaza al violeta): botones, links, títulos */
   --naranja: #dc3512;     /* naranja de marca: cabecera y barra de navegación */
   --brick: #d6402a;       /* rojo: solo para errores */
   --leaf: #3fa34d;        /* verde: solo para confirmaciones */
@@ -171,7 +171,7 @@ textarea {
 
 .el-btn-primary {
   background: var(--magenta);
-  color: #ffffff;
+  color: var(--ink);
 }
 
 .el-btn-google {
@@ -265,13 +265,13 @@ textarea {
 }
 
 .el-badge-completa {
-  background: rgba(149, 27, 129, 0.35);
-  color: var(--paper);
+  background: rgba(249, 178, 51, 0.35);
+  color: var(--ink);
 }
 
 .el-badge-pendiente_revision {
-  background: rgba(149, 27, 129, 0.35);
-  color: var(--paper);
+  background: rgba(249, 178, 51, 0.35);
+  color: var(--ink);
 }
 
 .el-badge-validada {
@@ -351,7 +351,7 @@ textarea {
   margin: 0 auto 14px;
   font-size: 24px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--ink);
 }
 
 /* ---- Mapa público ---- */
@@ -572,7 +572,7 @@ textarea {
 
 .el-chip-activa {
   background: var(--magenta);
-  color: #ffffff;
+  color: var(--ink);
   border-color: var(--magenta);
 }
 

@@ -5,6 +5,7 @@ import { PhotoCapture } from '../components/Capture/PhotoCapture'
 import { GeoCapture, type Ubicacion } from '../components/Capture/GeoCapture'
 import { ClasificacionForm, type DatosClasificacion } from '../components/Capture/ClasificacionForm'
 import { IndicadorPasos } from '../components/Capture/IndicadorPasos'
+import { UnirseEquipo } from '../components/UnirseEquipo'
 
 type Paso = 'modo' | 'foto' | 'ubicacion' | 'clasificacion' | 'guardado'
 
@@ -51,8 +52,7 @@ export function CapturePage({ onGuardado, onIrACuenta }: Props) {
   const [cargandoOpciones, setCargandoOpciones] = useState(true)
   const [opcionElegida, setOpcionElegida] = useState<OpcionInvestigacion | 'personal' | null>(null)
 
-  useEffect(() => {
-    async function cargarOpciones() {
+  async function cargarOpciones() {
       if (!user) return
       setCargandoOpciones(true)
 
@@ -95,7 +95,9 @@ export function CapturePage({ onGuardado, onIrACuenta }: Props) {
       }
       setOpciones(lista)
       setCargandoOpciones(false)
-    }
+  }
+
+  useEffect(() => {
     cargarOpciones()
   }, [user])
 
@@ -282,6 +284,14 @@ export function CapturePage({ onGuardado, onIrACuenta }: Props) {
                     ))}
                   </>
                 )}
+
+                <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--ink-line)' }}>
+                  <p style={{ fontSize: 15, marginBottom: 10, color: 'var(--paper-dim)' }}>
+                    ¿Formás parte de un equipo de investigación? Uníte con el código que te dio tu
+                    profesor o coordinador:
+                  </p>
+                  <UnirseEquipo onUnido={cargarOpciones} />
+                </div>
               </>
             )}
           </>
