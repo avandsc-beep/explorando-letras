@@ -4,7 +4,11 @@ import { GaleriaPage } from './GaleriaPage'
 
 const CLAVE_INTRO_VISTA = 'el_intro_vista'
 
-export function ExplorarPage() {
+interface Props {
+  onRegistrar: () => void
+}
+
+export function ExplorarPage({ onRegistrar }: Props) {
   const [vista, setVista] = useState<'mapa' | 'galeria'>('mapa')
   const [mostrarIntro, setMostrarIntro] = useState(
     () => typeof window !== 'undefined' && localStorage.getItem(CLAVE_INTRO_VISTA) !== 'true',
@@ -43,7 +47,7 @@ export function ExplorarPage() {
           </p>
           <p style={{ margin: '0 0 4px', fontSize: 16, lineHeight: 1.6 }}>
             2. Si querés, podés sumar tus propias fotos. Para eso hace falta crear una cuenta gratis —
-            tocá "Registrar" abajo cuando quieras empezar.
+            tocá "Registrar" en el menú cuando quieras empezar.
           </p>
           <button type="button" className="el-btn el-btn-ghost" style={{ marginTop: 12 }} onClick={cerrarIntro}>
             Entendido, no mostrar de nuevo
@@ -81,7 +85,7 @@ export function ExplorarPage() {
         </button>
       </div>
 
-      {vista === 'mapa' ? <MapaPage /> : <GaleriaPage />}
+      {vista === 'mapa' ? <MapaPage onRegistrar={onRegistrar} /> : <GaleriaPage onRegistrar={onRegistrar} />}
     </>
   )
 }

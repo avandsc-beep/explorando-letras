@@ -17,7 +17,7 @@ interface RegistroConDatos extends Registro {
   campana_nombre?: string
 }
 
-export function GaleriaPage() {
+export function GaleriaPage({ onRegistrar }: { onRegistrar: () => void }) {
   const [registros, setRegistros] = useState<RegistroConDatos[]>([])
   const [lexicos, setLexicos] = useState<Lexico[]>([])
   const [ciudadesDisponibles, setCiudadesDisponibles] = useState<string[]>([])
@@ -247,6 +247,15 @@ export function GaleriaPage() {
             </div>
           </div>
         ))
+      )}
+
+      {!cargando && registros.length > 0 && (
+        <div className="el-card" style={{ textAlign: 'center', marginTop: 8 }}>
+          <p style={{ margin: '0 0 12px', fontSize: 16 }}>¿Viste una letra así en la calle?</p>
+          <button type="button" className="el-btn el-btn-primary" onClick={onRegistrar}>
+            Sumala vos también
+          </button>
+        </div>
       )}
 
       {piezaSeleccionada && (

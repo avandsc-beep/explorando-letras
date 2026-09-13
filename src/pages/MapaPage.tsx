@@ -31,7 +31,7 @@ function escapeHtml(texto: string): string {
   return div.innerHTML
 }
 
-export function MapaPage() {
+export function MapaPage({ onRegistrar }: { onRegistrar: () => void }) {
   const [registros, setRegistros] = useState<Registro[]>([])
   const [lexicos, setLexicos] = useState<Lexico[]>([])
   const [ciudadesDisponibles, setCiudadesDisponibles] = useState<string[]>([])
@@ -248,6 +248,15 @@ export function MapaPage() {
       <div className="el-mapa-contador">
         {cargando ? 'Cargando piezas…' : `${registros.length} pieza${registros.length === 1 ? '' : 's'} en el mapa`}
       </div>
+
+      {!cargando && (
+        <div className="el-card" style={{ textAlign: 'center', margin: '10px 16px 16px' }}>
+          <p style={{ margin: '0 0 12px', fontSize: 16 }}>¿Viste una letra así en la calle?</p>
+          <button type="button" className="el-btn el-btn-primary" onClick={onRegistrar}>
+            Sumala vos también
+          </button>
+        </div>
+      )}
     </div>
   )
 }

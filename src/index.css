@@ -2,12 +2,12 @@
 
 :root {
   /* Paleta de marca: naranja + morado (extraídos de la identidad real del logo) */
-  --ink: #2e0f08;         /* fondo oscuro, con tinte cálido hacia el naranja */
-  --ink-soft: #3f160b;    /* superficie de tarjeta */
-  --ink-line: #6b2a16;    /* líneas divisorias, bordes */
+  --ink: #3c3c3b;         /* fondo gris neutro */
+  --ink-soft: #4a4a49;    /* superficie de tarjeta */
+  --ink-line: #5c5c5a;    /* líneas divisorias, bordes */
   --paper: #ffffff;       /* texto principal: blanco */
-  --paper-dim: #e8c7b8;   /* texto secundario, tinte cálido */
-  --magenta: #a6179a;     /* morado de marca (aclarado para legibilidad): botones, links, títulos */
+  --paper-dim: #c7c7c5;   /* texto secundario, gris neutro */
+  --magenta: #951b81;     /* morado de marca (del logo real): botones, links, títulos */
   --naranja: #dc3512;     /* naranja de marca: cabecera y barra de navegación */
   --brick: #d6402a;       /* rojo: solo para errores */
   --leaf: #3fa34d;        /* verde: solo para confirmaciones */
@@ -289,56 +289,72 @@ textarea {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  padding-bottom: 64px;
 }
 
-/* ---- Tabbar inferior ---- */
-.el-tabbar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  background: var(--naranja);
-  border-top: none;
-  z-index: 20;
-}
-
-.el-tab {
-  flex: 1;
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.72);
-  padding: 12px 0 14px;
-  font-size: 13px;
-  font-weight: 700;
+/* ---- Botón "Menú" en el encabezado ---- */
+.el-btn-menu {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #ffffff;
   font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 8px;
   cursor: pointer;
+}
+
+/* ---- Menú desplegable ---- */
+.el-menu-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 30;
+}
+
+.el-menu-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(300px, 80vw);
+  background: var(--ink-soft);
+  border-left: 1px solid var(--ink-line);
+  z-index: 31;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 2px;
+  padding: 70px 0 20px;
+  overflow-y: auto;
 }
 
-.el-tab-icono {
-  font-size: 20px;
+.el-menu-item {
+  background: none;
+  border: none;
+  text-align: left;
+  color: var(--paper);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  font-weight: 600;
+  padding: 16px 24px;
+  cursor: pointer;
 }
 
-.el-tab-activo {
-  color: #ffffff;
-  position: relative;
+.el-menu-item-activo {
+  color: var(--magenta);
+  background: rgba(149, 27, 129, 0.12);
 }
 
-.el-tab-activo::after {
-  content: '';
-  position: absolute;
-  bottom: 4px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 22px;
-  height: 3px;
-  border-radius: 2px;
-  background: #ffffff;
+.el-menu-divisor {
+  height: 1px;
+  background: var(--ink-line);
+  margin: 10px 24px;
+}
+
+.el-menu-usuario {
+  padding: 0 24px;
+  margin: 0 0 6px;
+  font-size: 14px;
+  color: var(--paper-dim);
 }
 
 /* ---- Mapa público ---- */
