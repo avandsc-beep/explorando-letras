@@ -147,6 +147,35 @@ export function AdminPage() {
     setProcesando(null)
   }
 
+  async function eliminar(r: RegistroConAutor) {
+    const confirmado = window.confirm(
+      'Esto va a borrar el registro definitivamente de la base de datos — ya no va a aparecer en el mapa ni en la galería, y no se puede deshacer. ¿Confirmás?',
+    )
+    if (!confirmado) return
+
+    setProcesando(r.id)
+    setError(null)
+
+    // borrar también la foto del storage, si existe
+    if (r.foto_url) {
+      const marcador = '/fotos-registros/'
+      const idx = r.foto_url.indexOf(marcador)
+      if (idx !== -1) {
+        const ruta = decodeURIComponent(r.foto_url.slice(idx + marcador.length))
+        await supabase.storage.from('fotos-registros').remove([ruta])
+      }
+    }
+
+    const { error: err } = await supabase.from('registros').delete().eq('id', r.id)
+
+    if (err) {
+      setError('No se pudo eliminar: ' + err.message)
+    } else {
+      setRegistros((prev) => prev.filter((x) => x.id !== r.id))
+    }
+    setProcesando(null)
+  }
+
   // Agrupar por informe (piezas de investigación entregadas juntas);
   // las piezas personales quedan cada una en su propio "grupo" de 1.
   const grupos: GrupoRevision[] = []
@@ -222,6 +251,16 @@ export function AdminPage() {
               </div>
             </>
           )}
+
+          <button
+            type="button"
+            className="el-btn el-btn-danger"
+            style={{ marginTop: 10 }}
+            disabled={procesando === r.id}
+            onClick={() => eliminar(r)}
+          >
+            Eliminar definitivamente
+          </button>
         </div>
       </div>
     )

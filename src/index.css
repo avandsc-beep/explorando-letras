@@ -316,7 +316,7 @@ textarea {
   gap: 3px;
   padding: 7px 2px;
   cursor: pointer;
-  color: var(--paper-dim);
+  color: rgba(249, 178, 51, 0.5);
   font-family: var(--font-sans);
 }
 
@@ -326,7 +326,7 @@ textarea {
 }
 
 .el-tab-icono-activo {
-  color: var(--naranja);
+  color: var(--magenta);
 }
 
 /* ---- Barra de navegación inferior (con íconos) ---- */

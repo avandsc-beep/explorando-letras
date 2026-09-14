@@ -3,26 +3,23 @@ import { supabase, type Registro, type Lexico } from '../lib/supabase'
 
 interface Filtros {
   ciudad: string
-  campana: string
   tecnica: string
   soporte: string
   funcion: string
 }
 
-type Agrupacion = 'ninguna' | 'ciudad' | 'fecha' | 'tecnica' | 'soporte' | 'funcion' | 'campana'
+type Agrupacion = 'ninguna' | 'ciudad' | 'fecha' | 'tecnica' | 'soporte' | 'funcion'
 
-const FILTROS_VACIOS: Filtros = { ciudad: '', campana: '', tecnica: '', soporte: '', funcion: '' }
+const FILTROS_VACIOS: Filtros = { ciudad: '', tecnica: '', soporte: '', funcion: '' }
 
 interface RegistroConDatos extends Registro {
   autor_nombre?: string
-  campana_nombre?: string
 }
 
 export function GaleriaPage({ onRegistrar }: { onRegistrar: () => void }) {
   const [registros, setRegistros] = useState<RegistroConDatos[]>([])
   const [lexicos, setLexicos] = useState<Lexico[]>([])
   const [ciudadesDisponibles, setCiudadesDisponibles] = useState<string[]>([])
-  const [campanas, setCampanas] = useState<{ id: string; nombre: string }[]>([])
   const [filtros, setFiltros] = useState<Filtros>(FILTROS_VACIOS)
   const [agrupacion, setAgrupacion] = useState<Agrupacion>('ninguna')
   const [cargando, setCargando] = useState(true)
@@ -44,12 +41,6 @@ export function GaleriaPage({ onRegistrar }: { onRegistrar: () => void }) {
         const unicas = [...new Set((data as { ciudad: string }[] ?? []).map((r) => r.ciudad))]
         setCiudadesDisponibles(unicas)
       })
-
-    supabase
-      .from('campanas')
-      .select('id, nombre')
-      .order('nombre')
-      .then(({ data }) => setCampanas((data as { id: string; nombre: string }[]) ?? []))
   }, [])
 
   useEffect(() => {
@@ -63,7 +54,6 @@ export function GaleriaPage({ onRegistrar }: { onRegistrar: () => void }) {
 
     let query = supabase.from('registros').select('*').eq('estado', 'validada')
     if (filtros.ciudad) query = query.eq('ciudad', filtros.ciudad)
-    if (filtros.campana) query = query.eq('campana_id', filtros.campana)
     if (filtros.tecnica) query = query.eq('tecnica', filtros.tecnica)
     if (filtros.soporte) query = query.eq('soporte', filtros.soporte)
     if (filtros.funcion) query = query.eq('funcion', filtros.funcion)
@@ -79,7 +69,6 @@ export function GaleriaPage({ onRegistrar }: { onRegistrar: () => void }) {
     const regs = (data as Registro[]) ?? []
 
     const idsUsuarios = [...new Set(regs.map((r) => r.usuario_id))]
-    const idsCampanas = [...new Set(regs.map((r) => r.campana_id).filter(Boolean))] as string[]
 
     let mapaAutores: Record<string, string> = {}
     if (idsUsuarios.length > 0) {
@@ -89,19 +78,10 @@ export function GaleriaPage({ onRegistrar }: { onRegistrar: () => void }) {
       }
     }
 
-    let mapaCampanas: Record<string, string> = {}
-    if (idsCampanas.length > 0) {
-      const { data: campanas } = await supabase.from('campanas').select('id, nombre').in('id', idsCampanas)
-      for (const c of (campanas as { id: string; nombre: string }[]) ?? []) {
-        mapaCampanas[c.id] = c.nombre
-      }
-    }
-
     setRegistros(
       regs.map((r) => ({
         ...r,
         autor_nombre: mapaAutores[r.usuario_id] ?? 'Alguien',
-        campana_nombre: r.campana_id ? mapaCampanas[r.campana_id] : undefined,
       })),
     )
     setCargando(false)
@@ -120,7 +100,6 @@ export function GaleriaPage({ onRegistrar }: { onRegistrar: () => void }) {
     if (agrupacion === 'tecnica') return r.tecnica || 'Sin técnica registrada'
     if (agrupacion === 'soporte') return r.soporte || 'Sin soporte registrado'
     if (agrupacion === 'funcion') return r.funcion || 'Sin función registrada'
-    if (agrupacion === 'campana') return r.campana_nombre || 'Aporte personal (sin campaña)'
     return ''
   }
 
@@ -179,18 +158,6 @@ export function GaleriaPage({ onRegistrar }: { onRegistrar: () => void }) {
       <div className="el-mapa-filtros" style={{ padding: 0, marginBottom: 12, background: 'none', border: 'none' }}>
         <select
           className="el-select el-select-compacto"
-          value={filtros.campana}
-          onChange={(e) => setFiltros({ ...filtros, campana: e.target.value })}
-        >
-          <option value="">Todas las campañas</option>
-          {campanas.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.nombre}
-            </option>
-          ))}
-        </select>
-        <select
-          className="el-select el-select-compacto"
           value={filtros.tecnica}
           onChange={(e) => setFiltros({ ...filtros, tecnica: e.target.value })}
         >
@@ -236,7 +203,6 @@ export function GaleriaPage({ onRegistrar }: { onRegistrar: () => void }) {
           <option value="tecnica">Agrupar por técnica</option>
           <option value="soporte">Agrupar por soporte</option>
           <option value="funcion">Agrupar por función</option>
-          <option value="campana">Agrupar por campaña</option>
         </select>
       </div>
 
@@ -299,7 +265,6 @@ export function GaleriaPage({ onRegistrar }: { onRegistrar: () => void }) {
               </p>
               <p className="el-hint" style={{ marginBottom: 12 }}>
                 Registrado por {piezaSeleccionada.autor_nombre}
-                {piezaSeleccionada.campana_nombre ? ` · ${piezaSeleccionada.campana_nombre}` : ''}
               </p>
 
               <p className="el-admin-linea">

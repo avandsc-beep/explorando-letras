@@ -18,13 +18,12 @@ L.Marker.prototype.options.icon = iconoDefecto
 
 interface Filtros {
   ciudad: string
-  campana: string
   tecnica: string
   soporte: string
   funcion: string
 }
 
-const FILTROS_VACIOS: Filtros = { ciudad: '', campana: '', tecnica: '', soporte: '', funcion: '' }
+const FILTROS_VACIOS: Filtros = { ciudad: '', tecnica: '', soporte: '', funcion: '' }
 
 function escapeHtml(texto: string): string {
   const div = document.createElement('div')
@@ -36,7 +35,6 @@ export function MapaPage({ onRegistrar }: { onRegistrar: () => void }) {
   const [registros, setRegistros] = useState<Registro[]>([])
   const [lexicos, setLexicos] = useState<Lexico[]>([])
   const [ciudadesDisponibles, setCiudadesDisponibles] = useState<string[]>([])
-  const [campanas, setCampanas] = useState<{ id: string; nombre: string }[]>([])
   const [filtros, setFiltros] = useState<Filtros>(FILTROS_VACIOS)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -65,13 +63,6 @@ export function MapaPage({ onRegistrar }: { onRegistrar: () => void }) {
         const unicas = [...new Set((data as { ciudad: string }[] ?? []).map((r) => r.ciudad))]
         setCiudadesDisponibles(unicas)
       })
-
-    // Campañas disponibles (para poder explorar el archivo por campaña de investigación)
-    supabase
-      .from('campanas')
-      .select('id, nombre')
-      .order('nombre')
-      .then(({ data }) => setCampanas((data as { id: string; nombre: string }[]) ?? []))
   }, [])
 
   // Cargar registros validados según los filtros activos
@@ -82,7 +73,6 @@ export function MapaPage({ onRegistrar }: { onRegistrar: () => void }) {
     let query = supabase.from('registros').select('*').eq('estado', 'validada')
 
     if (filtros.ciudad) query = query.eq('ciudad', filtros.ciudad)
-    if (filtros.campana) query = query.eq('campana_id', filtros.campana)
     if (filtros.tecnica) query = query.eq('tecnica', filtros.tecnica)
     if (filtros.soporte) query = query.eq('soporte', filtros.soporte)
     if (filtros.funcion) query = query.eq('funcion', filtros.funcion)
@@ -213,18 +203,6 @@ export function MapaPage({ onRegistrar }: { onRegistrar: () => void }) {
       <div className="el-mapa-filtros">
         <select
           className="el-select el-select-compacto"
-          value={filtros.campana}
-          onChange={(e) => setFiltros({ ...filtros, campana: e.target.value })}
-        >
-          <option value="">Todas las campañas</option>
-          {campanas.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.nombre}
-            </option>
-          ))}
-        </select>
-        <select
-          className="el-select el-select-compacto"
           value={filtros.tecnica}
           onChange={(e) => setFiltros({ ...filtros, tecnica: e.target.value })}
         >
@@ -259,7 +237,7 @@ export function MapaPage({ onRegistrar }: { onRegistrar: () => void }) {
             </option>
           ))}
         </select>
-        {(filtros.ciudad || filtros.campana || filtros.tecnica || filtros.soporte || filtros.funcion) && (
+        {(filtros.ciudad || filtros.tecnica || filtros.soporte || filtros.funcion) && (
           <button
             type="button"
             className="el-btn el-btn-ghost el-btn-limpiar"
